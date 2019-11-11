@@ -1,0 +1,84 @@
+\documentclass{article}
+\usepackage[a4paper, margin=1in]{geometry}
+
+\usepackage{tikz}
+\usepackage{setspace}
+\usepackage{color}
+\usepackage{graphicx}
+\usepackage{url}
+\usepackage{amsmath,amssymb}
+\usepackage{mathtools}
+\usepackage{multicol}
+
+\setlength{\parindent}{0pt}
+
+
+\title{Representing Additive Models as Mixed Models}
+\author{Notations Cheat Sheet}
+\date{}
+
+
+
+\begin{document}
+\def\arraystretch{1.3}
+\maketitle
+\vspace{2em}
+\begin{multicols}{2}
+%\section*{General}
+%
+%\begin{tabular}{l l}
+%$x$ & independent variable \\
+%$y$ & dependent variable, target \\
+%$\epsilon$ & error term \\
+%\end{tabular}
+
+
+\section*{Truncated Power Basis}
+
+$$y = \theta_0 + \theta_1x + \theta_2x^2 + ... + \theta_dx^d + \sum_{k=1}^K \theta_{dk}(x-\kappa_k)_+^d $$
+
+\begin{tabular}{l l}
+$\theta_l$ & coefficients \\
+$\kappa_k$ & $k$th knot \\
+$K$ & number of knots \\
+\end{tabular}
+
+\section*{Additive Models}
+
+$$y = \sum_{j=1}^p V_j\xi_j + U\gamma$$
+
+\begin{tabular}{l l}
+$p$ & number of covariates \\
+$V_j$ & design matrices for non-linear effects \\
+$\xi_j$ & non-linear parameters \\
+$U$ & design matrix for linear effects \\
+$\gamma$ & linear parameter vectors \\
+$b_k(.)$ & basis function for $k$th knot \\
+$\lambda_j$ & roughness penalty \\
+$K_j$ & penalty matrix \\
+\end{tabular}
+
+\section*{Representation}
+
+$$\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$$
+
+\begin{tabular}{l l}
+$\Sigma_j$ & covariance matrix of prior \\
+$\tau_j^2$ & variance of prior \\
+$\beta_j$ & non-penalized part of $\xi_j$ \\
+$\tilde{X}_j$ &  \\
+$b_j$ & penalized part of $\xi_j$ \\
+$\tilde{Z}_j$ &  \\
+$Z$ &  \\
+$X$ &  \\
+\end{tabular}
+
+\section*{Inference}
+
+\begin{tabular}{l l}
+$W$ &  \\
+$Q$ &  \\
+\end{tabular}
+
+\end{multicols}
+\end{document}
