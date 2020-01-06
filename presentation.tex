@@ -1,4 +1,4 @@
-\documentclass[final]{beamer}
+\documentclass[final]{beamer} 
 \usetheme{Singapore}
 \usecolortheme{Lancashire}
 %%\usepackage[orientation=portrait,size=a1,scale=0.9,debug]{beamerposter}
@@ -98,7 +98,7 @@
 univariate:
 $$
 y = 
- \theta_0 + \theta_1x + \theta_2x^2 + ... + \theta_dx^d + \sum_{k=1}^K \theta_{dk}(x-\kappa_k)_+^d 
+ \theta_0 + \theta_1x + \theta_2x^2 + ... + \theta_dx^d + \sum_{k=1}^K \theta_{dk}(x-\kappa_k)_+^d + \epsilon 
 $$
 \vspace{-3.5em}
 \end{minipage}
@@ -119,6 +119,7 @@ y =
 \only<3>{
  \inserteqstrut{\overbrace{\theta_0 + \theta_1x + \theta_2x^2}^{\text{fixed effects}}} +  \inserteqstrutb{\overbrace{\theta_{21}(x-\kappa_1)_+^2 + \theta_{22}(x-\kappa_2)_+^2}^{\text{random effects: depend on $i$}}}
 }
++\epsilon
 \end{align*}
 \end{overprint}
 
@@ -151,14 +152,15 @@ Semiparametric regression:
 \begin{overprint}
 \begin{align*}
 \only<1>{
-y_i = \inserteqstrut{f(\nu_{i})} + u^T_i \gamma
+\hat{y}_i = \inserteqstrut{f(\nu_{i})} + u^T_i \gamma
 }
 \only<2-3>{
-y_i = \inserteqstrut{\overbrace{f(\nu_{i})}^{v^T_{i}\xi}} + u^T_i \gamma
+\hat{y}_i = \inserteqstrut{\overbrace{f(\nu_{i})}^{v^T_{i}\xi}} + u^T_i \gamma
 }
 \only<4-5>{
-y_i = \overbrace{f_1(\nu_{i1})}^{v^T_{i1}\xi_1} + ... + \overbrace{f_p(\nu_{ip})}^{v^T_{ip}\xi_p} + u^T_i \gamma
+\hat{y}_i = \overbrace{f_1(\nu_{i1})}^{v^T_{i1}\xi_1} + ... + \overbrace{f_p(\nu_{ip})}^{v^T_{ip}\xi_p} + u^T_i \gamma
 }
++\epsilon_i
 \end{align*}
 \end{overprint}
 \vspace{-2.5em}
@@ -173,10 +175,10 @@ y_i = \overbrace{f_1(\nu_{i1})}^{v^T_{i1}\xi_1} + ... + \overbrace{f_p(\nu_{ip})
 \begin{overprint}
 \begin{align*}
 \only<3>{
-y = V\xi + U\gamma
+\hat{y} = V\xi + U\gamma
 }
 \only<5>{
-y = V_1\xi_1 + ... + V_p \xi_p + U\gamma =\sum_{j=1}^p V_j\xi_j + U\gamma
+\hat{y} = V_1\xi_1 + ... + V_p \xi_p + U\gamma =\sum_{j=1}^p V_j\xi_j + U\gamma
 }
 \end{align*}
 \end{overprint}
@@ -194,10 +196,10 @@ y = V_1\xi_1 + ... + V_p \xi_p + U\gamma =\sum_{j=1}^p V_j\xi_j + U\gamma
 \begin{frame}[b]
 \frametitle{Splines}
 
-Spline functions are piecewise polynomial segments (called basis functions) joined together smoothly at so-called knots.
+Spline functions are \textbf{piecewise polynomial segments} (called basis functions) joined together smoothly at so-called knots.
 \begin{overprint}
 \begin{align*}
-y = V\xi + U\gamma 
+\hat{y} = V\xi + U\gamma 
 \onslide<2-3>{
 = \begin{pmatrix}
 b_1(x_1) & \dots & b_k(x_1) \\
@@ -261,7 +263,7 @@ Penalized Regression Spline:
 
 \begin{overprint}
 \begin{flushleft}
-\onslide<1>{Control wiggliness:}\onslide<2>{\hspace{-7.6em}e.\,g.\ first order differences $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$:}\onslide<3>{\hspace{-22.1em} Problem: How to choose $\lambda$?}
+\onslide<1>{Control wiggliness (bias-variance tradeoff):}\onslide<2>{\hspace{-17.6em}e.\,g.\ first order differences $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$:}\onslide<3>{\hspace{-22.1em} Problem: How to choose $\lambda$?}
 \end{flushleft}
 \vspace{-2em}
 \end{overprint}
@@ -319,14 +321,14 @@ $$y_i = \underbrace{X_i \beta}_{\mathclap{\text{fixed effects}}} + \overbrace{Z_
 
 \textcolor{beamer@postercolour}{Prior: } $ p(\gamma) \propto \text{const.}$ \pause
 
-\textcolor{beamer@postercolour}{Prior: }  $p(\xi_j|\tau_j^2)  \propto \exp\left(-\frac{1}{2\tau^2_j} \xi_j^T\Sigma_j \xi_j\right) $  \pause
+\textcolor{beamer@postercolour}{Prior: }  $p(\xi_j|\tau_j^2)  \propto \exp\left(-\frac{1}{2\tau^2_j} \xi_j^T\Sigma^{-1}_j \xi_j\right) $  \pause
 
 \textcolor{beamer@postercolour}{Posterior: }
 $p(\xi_1, ... \xi_p, \gamma|y) \propto L(y,\xi_1, ... \xi_p, \gamma)\prod_{j=1}^p p(\xi_j|\tau_j^2) $ \pause
 \vspace{1em}
 
 \item Maximum Likelihood for $\tau_j^2$ (so far treated as fixed):
-$$\max_{\tau_1, ..., \tau_p} \log L(\gamma, \xi_1,...,\xi_p) - \sum_{j=1}^p \underbrace{\frac{1}{2\tau^2_j}}_{\lambda_j} \xi_j^T \underbrace{\Sigma_j}_{K_j} \xi_j$$
+$$\max_{\tau_1, ..., \tau_p} \log L(\gamma, \xi_1,...,\xi_p) - \sum_{j=1}^p \underbrace{\frac{1}{2\tau^2_j}}_{\lambda_j} \xi_j^T \underbrace{\Sigma^{-1}_j}_{K_j} \xi_j$$
 \end{itemize}
 
 \pause
@@ -484,7 +486,7 @@ $\text{dim}(b_j) =\text{rank}(K_j)$
 \frametitle{Mixed Model Representation}
 
 \begin{columns}[T]
-\begin{column}{0.7\textwidth}
+\begin{column}{0.58\textwidth}
 \textcolor{beamer@postercolour}{Decomposition $\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$:}  
 
 \begin{minipage}[t][5em][t]{\textwidth}
@@ -516,7 +518,7 @@ y = \sum_{j=1}^p V_j
 \beta &:= (\beta_1^T,..., \beta_p^T, \gamma^T) \\
 b &:= (b_1^T,...,b_p^T) \\
 Z &:= V_j \tilde{Z}_j \\
-X &:= V_j \tilde{X}_j
+X &:= (V_j \tilde{X}_j, U)
 \end{align*}
 }
 \end{column}
@@ -729,6 +731,7 @@ $$\vartheta^{(k+1)} = \vartheta^{(k)} + F^*(\vartheta^{(k)})^{-1}s^*(\vartheta^{
 \begin{itemize}
 \item[$+$] no reparameterization needed
 \item[$+$] no Laplace approximation
+\item[$-$] identifiability problems less detectable
 \item[$-$] how to choose hyperpriors?
 \item[$-$] Markov chain convergence is difficult to determine
 \end{itemize}
@@ -737,9 +740,9 @@ $$\vartheta^{(k+1)} = \vartheta^{(k)} + F^*(\vartheta^{(k)})^{-1}s^*(\vartheta^{
 \centering{\textcolor{beamer@postercolour}{Prediction error methods \\ (AIC, GCV)}}
 \begin{itemize}
 \item[$+$] better prediction error performance 
-\item[$-$] better resistance to overfit
-\item[$-$] less smoothing parameter variability
-\item[$-$] reduced tendency to multiple minima
+\item[$-$] worse resistance to overfit
+\item[$-$] higher smoothing parameter variability
+\item[$-$] increased tendency to multiple minima
 \item[$\rightarrow$] \textit{more on that next week}
 \end{itemize}
 \end{column}
