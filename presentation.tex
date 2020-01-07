@@ -713,8 +713,8 @@ Maximize the restricted likelihood (REML) using Newton-Raphson:
 
 \textcolor{beamer@postercolour}{\textbf{Single iterations (old)}}
 \begin{enumerate}
-\item Update  $\boldsymbol{\beta}$ and $\mathbf{b}$ given the current $\lambda$
-\item Update $\lambda$ using Fisher-Scoring (or Newton-Raphson)
+\item Update  $\hat{\beta}$ and $\hat{b}$ given the current $\lambda$
+\item Update $\hat{\lambda}$ using Fisher-Scoring (or Newton-Raphson)
 \item Iterate until convergence
 \end{enumerate}
 
@@ -727,7 +727,7 @@ Maximize the restricted likelihood (REML) using Newton-Raphson:
 
 Using Newton-Raphson
 \begin{itemize}
-\item For each $\lambda$: Get estimates for $\boldsymbol{\beta}$ and $\mathbf{b}$: 
+\item For each $\hat{\lambda}$: Get estimates for $\beta$ and $b$: 
 
 Solve with penalized iteratively re-weighted least squares (PIRLS) and Newton-Raphson
 \end{itemize}
