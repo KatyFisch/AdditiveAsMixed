@@ -160,7 +160,6 @@ Semiparametric regression:
 \only<4-5>{
 \hat{y}_i = \overbrace{f_1(\nu_{i1})}^{v^T_{i1}\xi_1} + ... + \overbrace{f_p(\nu_{ip})}^{v^T_{ip}\xi_p} + u^T_i \gamma
 }
-+\epsilon_i
 \end{align*}
 \end{overprint}
 \vspace{-2.5em}
@@ -600,6 +599,41 @@ Z^TWy
 \end{frame}
 
 \begin{frame}
+\frametitle{Variance Estimates}
+
+\textcolor{beamer@postercolour}{Maximum Likelihood (ML)} 
+
+\begin{itemize}
+\item uses marginal likelihood $y|\beta \sim \mathrm{N}(X\beta,\Sigma)$ 
+
+\begin{enumerate}
+\item Derive $\hat{\beta}$ analytically
+\item Plug in to get profile likelihood for $\tau^2$ and $\sigma^2$
+\item Maximize numerically
+\end{enumerate}
+
+\item estimates variance components of posterior mode
+\end{itemize}
+
+\vspace{1em}
+\pause
+
+\textcolor{beamer@postercolour}{Restricted ML (REML)}
+
+\begin{itemize}
+\item directly uses marginal distribution of $y|\beta, b$
+
+\item Advantages over ML:
+\begin{itemize}
+\item[$+$] considers loss of degrees of freedom due to estimation of $\beta$ 
+\item[$+$] estimates mode of the marginal posterior for the variances
+\end{itemize}
+\end{itemize}
+
+
+\end{frame}
+
+\begin{frame}
 \frametitle{Variance Estimates $\hat{\sigma}^2$ and $\hat{\tau}^2$}
 
 Maximize the restricted likelihood (REML) using Newton-Raphson:
@@ -675,48 +709,33 @@ Maximize the restricted likelihood (REML) using Newton-Raphson:
 
 
 \begin{frame}
-\frametitle{Nested REML estimation}
+\frametitle{(RE)ML estimation}
+
+\textcolor{beamer@postercolour}{\textbf{Single iterations (old)}}
+\begin{enumerate}
+\item Update  $\boldsymbol{\beta}$ and $\mathbf{b}$ given the current $\lambda$
+\item Update $\lambda$ using Fisher-Scoring (or Newton-Raphson)
+\item Iterate until convergence
+\end{enumerate}
+
+\vspace{0.5em}
+\pause
+
+\textcolor{beamer@postercolour}{\textbf{Nested iterations (new)}}
+\begin{enumerate}
+\item \textbf{Estimate the penalty $\lambda$:}
+
+Using Newton-Raphson
 \begin{itemize}
+\item For each $\lambda$: Get estimates for $\boldsymbol{\beta}$ and $\mathbf{b}$: 
 
-\item \textbf{Estimate $\boldsymbol{\beta}$ and $\mathbf{b}$:} 
-
-$$\overbrace{\begin{pmatrix}
-X^TWX & X^TWZ \\
-Z^TWX & Z^TWZ + Q^{-1}
-\end{pmatrix}}^{\text{Fisher information}}
-\begin{pmatrix}
-\hat{\beta} \\
-\hat{b}
-\end{pmatrix} =
-\begin{pmatrix}
-X^TWy \\
-Z^TWy
-\end{pmatrix}$$
-
- with $W=\text{diag}(\sigma^2)$ and $Q=\text{blockdiag}(\tau_1^2I_{k1},..., \tau_p^2I_{kp})$
-
-Solve with penalized iteratively re-weighted least squares \& Newton
-
-\item \textbf{Estimate the variance components $\boldsymbol{\tau}^2 $ and $\boldsymbol{\sigma^2}$:}
-
-$$\vartheta^{(k+1)} = \vartheta^{(k)} + F^*(\vartheta^{(k)})^{-1}s^*(\vartheta^{(k)})$$
-
-%\item \textbf{Iterate until convergence}
-
+Solve with penalized iteratively re-weighted least squares (PIRLS) and Newton-Raphson
 \end{itemize}
-
-
+\item \textbf{Iterate until convergence}
+\end{enumerate}
 \end{frame}
 
 
-
-\section{Applications}
-
-\begin{frame}
-\frametitle{Applications}
-
-
-\end{frame}
 
 
 
@@ -730,7 +749,6 @@ $$\vartheta^{(k+1)} = \vartheta^{(k)} + F^*(\vartheta^{(k)})^{-1}s^*(\vartheta^{
 \centering{\textcolor{beamer@postercolour}{Fully Bayesian approach \\(MCMC)}}
 \begin{itemize}
 \item[$+$] no reparameterization needed
-\item[$+$] no Laplace approximation
 \item[$-$] identifiability problems less detectable
 \item[$-$] how to choose hyperpriors?
 \item[$-$] Markov chain convergence is difficult to determine
@@ -750,14 +768,14 @@ $$\vartheta^{(k+1)} = \vartheta^{(k)} + F^*(\vartheta^{(k)})^{-1}s^*(\vartheta^{
 \end{frame}
 
 
-\begin{frame}
-\frametitle{Prospect}
+%\begin{frame}
+%\frametitle{Prospect: GLM}
 
-GLM
+%GLM
 
-Non-spline semiparametric regression
 
-\end{frame}
+
+%\end{frame}
 
 \begin{frame}
 \frametitle{Summary}
@@ -825,39 +843,7 @@ $K_j = \Gamma_j \Lambda_j \Gamma^T$, so $L_j = \Gamma \Lambda_j^{1/2}$
 
 \end{frame}
 
-\begin{frame}
-\frametitle{Variance Estimates}
 
-\textcolor{beamer@postercolour}{Maximum Likelihood (ML)} 
-
-\begin{itemize}
-\item uses marginal likelihood $y|\beta \sim \mathrm{N}(X\beta,\Sigma)$ 
-
-\begin{enumerate}
-\item Derive $\hat{\beta}$ analytically
-\item Plug in to get profile likelihood for $\tau^2$ and $\sigma^2$
-\item Maximize numerically
-\end{enumerate}
-
-\item estimates variance components of posterior mode
-\end{itemize}
-
-\vspace{1em}
-
-\textcolor{beamer@postercolour}{Restricted ML (REML)}
-
-\begin{itemize}
-\item directly uses marginal distribution of $y|\beta, b$
-
-\item Advantages over ML:
-\begin{itemize}
-\item[$+$] considers loss of degrees of freedom due to estimation of $\beta$ 
-\item[$+$] estimates mode of the marginal posterior for the variances
-\end{itemize}
-\end{itemize}
-
-
-\end{frame}
 
 %\begin{frame}
 %\frametitle{Smoothing Parameter Selection}
