@@ -601,10 +601,10 @@ Z^TWy
 \begin{frame}
 \frametitle{Variance Estimates}
 
-\textcolor{beamer@postercolour}{Maximum Likelihood (ML)} 
+\textcolor{beamer@postercolour}{Maximum Likelihood (integrate $b$ out)} 
 
 \begin{itemize}
-\item uses marginal likelihood $y|\beta \sim \mathrm{N}(X\beta,\Sigma)$ 
+\item uses (partialy) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$
 
 \begin{enumerate}
 \item Derive $\hat{\beta}$ analytically
@@ -618,10 +618,10 @@ Z^TWy
 \vspace{1em}
 \pause
 
-\textcolor{beamer@postercolour}{Restricted ML (REML)}
+\textcolor{beamer@postercolour}{Restricted ML integrate ($b$ and $\beta$ out)}
 
 \begin{itemize}
-\item directly uses marginal distribution of $y|\beta, b$
+\item directly uses marginal distribution of $y$
 
 \item Advantages over ML:
 \begin{itemize}
