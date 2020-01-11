@@ -537,7 +537,32 @@ X &:= (V_j \tilde{X}_j, U)
 
 \end{frame}
 
+\begin{frame}
+\frametitle{Choosing $\tilde{X}_j$ and $\tilde{Z}_j$ for Mixed Model Representation}
 
+\begin{block}{\small Recap: Conditions}
+\small
+\begin{enumerate}
+\itemsep0em 
+\item 1-on-1 transformation: matrix $(\tilde{X}_j \:\:  \tilde{Z}_j)$ has full rank
+\item $\tilde{X}_j$ and $\tilde{Z}_j$ are orthogonal: $\tilde{X}_j^T \tilde{Z}_j = 0$
+\item $\beta_j$ not penalized by $K_j$: $\tilde{X}_j^T K_j \tilde{X}_j = 0$
+\item Gaussian prior for $b_j$: $\tilde{Z}_j^T K_j \tilde{Z}_j = I_{kj}$
+\end{enumerate}
+\end{block}
+\vspace{-1em}
+\begin{block}{Setup}
+\begin{itemize}
+\item $\tilde{X}_j$ is a basis of the null space of $K_j$ (condition 3)
+\item $\tilde{Z}_j =L_j (L_j^T L_j)^{-1}$ with $K_j =L_j L_j^T$ (conditions 1 and 4)
+\item Choose $L_j$ s.\,t.\ $L_j^T\tilde{X}_j = 0$ and $\tilde{X}_jL_j^T = 0$ (condition 2)
+
+e.\,g.\ spectral decomposition: 
+$K_j = \Gamma_j \Lambda_j \Gamma^T$, so $L_j = \Gamma \Lambda_j^{1/2}$
+\end{itemize}
+\end{block}
+
+\end{frame}
 
 
 \begin{frame}
@@ -565,7 +590,7 @@ X &:= (V_j \tilde{X}_j, U)
 \vspace{2em}
 
 \only<5->{
-\textcolor{beamer@postercolour}{log-Posterior: } $$l_p(\beta,b|y) = l(y,\beta,b) - \sum_{j=1}^p \overbrace{\frac{1}{2\tau_j^2}}^{=\lambda} b_j^T  b_j $$
+\textcolor{beamer@postercolour}{log-Posterior: } $$l_p(\beta,b|y) \propto l(y,\beta,b) - \sum_{j=1}^p \overbrace{\frac{1}{2\tau_j^2}}^{=\lambda} b_j^T  b_j $$
 }
 \end{minipage}
 
@@ -604,7 +629,7 @@ Z^TWy
 \textcolor{beamer@postercolour}{Maximum Likelihood (integrate $b$ out)} 
 
 \begin{itemize}
-\item uses (partialy) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$
+\item uses (partially) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$
 
 \begin{enumerate}
 \item Derive $\hat{\beta}$ analytically
@@ -712,27 +737,34 @@ Maximize the restricted likelihood (REML) using Newton-Raphson:
 \frametitle{(RE)ML estimation}
 
 \textcolor{beamer@postercolour}{\textbf{Single iterations (old)}}
-\begin{enumerate}
-\item Update  $\hat{\beta}$ and $\hat{b}$ given the current $\hat{\lambda}$
-\item Update $\hat{\lambda}$ using Fisher-Scoring (or Newton-Raphson)
-\item Iterate until convergence
-\end{enumerate}
+\begin{itemize}
+\item \textbf{Update  $\boldsymbol{\hat{\beta}}$ and $\boldsymbol{\hat{b}}$} given the current $\hat{\lambda}$
+\item \textbf{Update $\boldsymbol{\hat{\lambda}}$} using Fisher-Scoring (or Newton-Raphson)
 
-\vspace{0.5em}
+\vspace{0.2em}
+$\rightarrow$ $\mathcal{V}_{\hat{\beta}, \hat{b}}(\lambda)$ depends on $\hat{\beta}$ and $\hat{b}$
+\end{itemize}
+$\Rightarrow$ Convergence is not guaranteed
+
+\vspace{1em}
 \pause
 
 \textcolor{beamer@postercolour}{\textbf{Nested iterations (new)}}
-\begin{enumerate}
-\item \textbf{Estimate the penalty $\lambda$:}
-
-Using Newton-Raphson
 \begin{itemize}
-\item For each $\hat{\lambda}$: Get estimates for $\beta$ and $b$: 
+\item \textbf{Update $\boldsymbol{\hat{\lambda}}$} using Newton-Raphson
 
-Solve with penalized iteratively re-weighted least squares (PIRLS) and Newton-Raphson
+\begin{itemize}
+\item \textbf{Estimate $\boldsymbol{\hat{\beta}_\lambda}$ in inner PIRLS loop}
 \end{itemize}
-\item \textbf{Iterate until convergence}
-\end{enumerate}
+
+$\rightarrow \mathcal{V}(\lambda)$ depends on $\beta$ only via $\hat{\beta}_\lambda$
+
+\item \textbf{Update $\boldsymbol{\hat{\beta}}$ and $\boldsymbol{\hat{b}}$} given the current $\hat{\lambda}$
+
+Solve with  Newton-Raphson
+\end{itemize}
+$\Rightarrow$ Convergence is guaranteed (under mild regulatory conditions)
+
 \end{frame}
 
 
@@ -749,7 +781,6 @@ Solve with penalized iteratively re-weighted least squares (PIRLS) and Newton-Ra
 \centering{\textcolor{beamer@postercolour}{Fully Bayesian approach \\(MCMC)}}
 \begin{itemize}
 \item[$+$] no reparameterization needed
-\item[$-$] identifiability problems less detectable
 \item[$-$] how to choose hyperpriors?
 \item[$-$] Markov chain convergence is difficult to determine
 \end{itemize}
@@ -816,32 +847,7 @@ Wood, S. N. (2011). {\em J.\ R.\ Statist.\ Soc.\ B}, 73: 3--36.
 
 
 
-\begin{frame}
-\frametitle{Choosing $\tilde{X}_j$ and $\tilde{Z}_j$ for Mixed Model Representation}
 
-\begin{block}{\small Recap: Conditions}
-\small
-\begin{enumerate}
-\itemsep0em 
-\item 1-on-1 transformation: matrix $(\tilde{X}_j \:\:  \tilde{Z}_j)$ has full rank
-\item $\tilde{X}_j$ and $\tilde{Z}_j$ are orthogonal: $\tilde{X}_j^T \tilde{Z}_j = 0$
-\item $\beta_j$ not penalized by $K_j$: $\tilde{X}_j^T K_j \tilde{X}_j = 0$
-\item Gaussian prior for $b_j$: $\tilde{Z}_j^T K_j \tilde{Z}_j = I_{kj}$
-\end{enumerate}
-\end{block}
-\vspace{-1em}
-\begin{block}{Setup}
-\begin{itemize}
-\item $\tilde{X}_j$ is a basis of the null space of $K_j$ (condition 3)
-\item $\tilde{Z}_j =L_j (L_j^T L_j)^{-1}$ with $K_j =L_j L_j^T$ (conditions 1 and 4)
-\item Choose $L_j$ s.\,t.\ $L_j^T\tilde{X}_j = 0$ and $\tilde{X}_jL_j^T = 0$ (condition 2)
-
-e.\,g.\ spectral decomposition: 
-$K_j = \Gamma_j \Lambda_j \Gamma^T$, so $L_j = \Gamma \Lambda_j^{1/2}$
-\end{itemize}
-\end{block}
-
-\end{frame}
 
 
 
