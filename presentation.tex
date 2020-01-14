@@ -540,7 +540,7 @@ X &:= (V_j \tilde{X}_j, U)
 \begin{frame}
 \frametitle{Choosing $\tilde{X}_j$ and $\tilde{Z}_j$ for Mixed Model Representation}
 
-\begin{block}{\small Recap: Conditions}
+\begin{block}{\small Recap: Requirements}
 \small
 \begin{enumerate}
 \itemsep0em 
@@ -590,7 +590,7 @@ $K_j = \Gamma_j \Lambda_j \Gamma^T$, so $L_j = \Gamma \Lambda_j^{1/2}$
 \vspace{2em}
 
 \only<5->{
-\textcolor{beamer@postercolour}{log-Posterior: } $$l_p(\beta,b|y) \propto l(y,\beta,b) - \sum_{j=1}^p \overbrace{\frac{1}{2\tau_j^2}}^{=\lambda} b_j^T  b_j $$
+\textcolor{beamer@postercolour}{log-Posterior: } $$l_p(\beta,b|y) = l(y,\beta,b) - \sum_{j=1}^p \overbrace{\frac{1}{2\tau_j^2}}^{=\lambda} b_j^T  b_j $$
 }
 \end{minipage}
 
@@ -754,8 +754,9 @@ $\Rightarrow$ Convergence is not guaranteed
 \item \textbf{Update $\boldsymbol{\hat{\lambda}}$} using Newton-Raphson
 
 \begin{itemize}
-\item \textbf{Estimate $\boldsymbol{\hat{\beta}_\lambda}$ in inner PIRLS loop}
+\item \textbf{Estimate $\boldsymbol{\hat{\beta}_\lambda}$ in an inner loop}
 \end{itemize}
+
 
 $\rightarrow \mathcal{V}(\lambda)$ depends on $\beta$ only via $\hat{\beta}_\lambda$
 
@@ -827,7 +828,7 @@ $\Rightarrow$ Convergence is guaranteed (under mild regulatory conditions)
 				\begin{thebibliography}{10}
 				
 \bibitem[Fahrmeir et al., 2013]{fahrmeir}
-Fahrmeir, L., Kneib, T., Lang, S., \&  Marx, B. (2006). {\em Regression -- Models, Methods and Applications}.
+Fahrmeir, L., Kneib, T., Lang, S., \&  Marx, B. (2013). {\em Regression -- Models, Methods and Applications}.
 \newblock Springer-Verlag Berlin Heidelberg.
 
 \bibitem[Kneib, 2006]{kneib}
