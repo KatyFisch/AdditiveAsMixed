@@ -58,6 +58,17 @@ $\lambda_j$ & roughness penalty \\
 $K_j$ & penalty matrix \\
 \end{tabular}
 
+\section*{Mixed Models}
+
+$$y_i = \underbrace{X_i \beta}_{\mathclap{\text{fixed effects}}} + \overbrace{Z_i b_i}^{\mathclap{\text{random effects}}} + \: \epsilon_i$$
+
+\begin{tabular}{l l}
+$\beta_j$ & parameter for the fixed effects \\
+$b_j$ & parameter for the random effects \\
+$X$ &  design matrix for the fixed effects \\
+$Z$ & design matrix for the random effects \\
+\end{tabular}
+
 \section*{Representation}
 
 $$\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$$
@@ -66,18 +77,14 @@ $$\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$$
 $\Sigma_j$ & covariance matrix of prior \\
 $\tau_j^2$ & variance of prior \\
 $\beta_j$ & non-penalized part of $\xi_j$ \\
-$\tilde{X}_j$ &  \\
 $b_j$ & penalized part of $\xi_j$ \\
-$\tilde{Z}_j$ &  \\
-$Z$ &  \\
-$X$ &  \\
 \end{tabular}
 
 \section*{Inference}
 
 \begin{tabular}{l l}
-$W$ &  \\
-$Q$ &  \\
+$W$ & diagonal matrix of $\sigma^2$ \\
+$Q$ &  block diagonal matrix of $\tau_j^2I_{kj}$ \\ 
 \end{tabular}
 
 \end{multicols}
