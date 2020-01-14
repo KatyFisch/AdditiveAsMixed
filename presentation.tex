@@ -527,7 +527,7 @@ X &:= (V_j \tilde{X}_j, U)
 \textcolor{beamer@postercolour}{Requirements:}
 
 \begin{enumerate}
-\item<5-> 1-on-1 transformation: matrix $(\tilde{X}_j \:\:  \tilde{Z}_j)$ has full rank 
+\item<5-> 1-to-1 transformation: matrix $(\tilde{X}_j \:\:  \tilde{Z}_j)$ has full rank 
 \item<6-> $\tilde{X}_j$ and $\tilde{Z}_j$ are orthogonal: $\tilde{X}_j^T \tilde{Z}_j = 0$
 \item<7-> $\beta_j$ not penalized by $K_j$: $\tilde{X}_j^T K_j \tilde{X}_j = 0$
 \item<8-> Gaussian prior for $b_j$: $\tilde{Z}_j^T K_j \tilde{Z}_j = I_{kj}$
@@ -758,11 +758,10 @@ $\Rightarrow$ Convergence is not guaranteed
 \end{itemize}
 
 
-$\rightarrow \mathcal{V}(\lambda)$ depends on $\beta$ only via $\hat{\beta}_\lambda$
+$\rightarrow \mathcal{V}(\lambda)$ depends on $\beta$ and $b$ only via $\hat{\beta}_\lambda$ and $\hat{b}_\lambda$
 
 \item \textbf{Update $\boldsymbol{\hat{\beta}}$ and $\boldsymbol{\hat{b}}$} given the current $\hat{\lambda}$
 
-Solve with  Newton-Raphson
 \end{itemize}
 $\Rightarrow$ Convergence is guaranteed (under mild regulatory conditions)
 
