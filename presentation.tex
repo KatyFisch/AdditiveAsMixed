@@ -754,7 +754,7 @@ $\Rightarrow$ Convergence is not guaranteed
 \item \textbf{Update $\boldsymbol{\hat{\lambda}}$} using Newton-Raphson
 
 \begin{itemize}
-\item \textbf{Estimate $\boldsymbol{\hat{\beta}_\lambda}$ and $\boldsymbol{\hat{b}_\lambda}$ in an inner loop}
+\item \textbf{for each step: estimate $\boldsymbol{\hat{\beta}_\lambda}$ and $\boldsymbol{\hat{b}_\lambda}$}
 \end{itemize}
 
 
@@ -812,7 +812,7 @@ $\Rightarrow$ Convergence is guaranteed (under mild regulatory conditions)
 \frametitle{Summary}
 
 \begin{itemize}
-\item Semiparametric models can be \textbf{written as mixed models}.
+\item Semiparametric models can be \textbf{written as mixed models}, which enables an efficient way to estimate the penalty term $\lambda$.
 \item In order to get a proper random effects distribution, the flexible parameters have to be \textbf{separated} into sets of parameters with \textbf{flat priors} and sets with \textbf{proper priors}.
 \item The penalty term  is proportional to the inverse of the prior variance: $\mathbf{\boldsymbol{\lambda} \boldsymbol{\propto} \frac{1}{\boldsymbol{\tau}^2}}$
 \item For good results in mixed model inference, the \textbf{penalty term} has to be estimated in a \textbf{nested iteration} setup with the other parameters.
