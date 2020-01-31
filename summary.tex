@@ -1,0 +1,118 @@
+\documentclass[12pt]{article} 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+%\usepackage{xcolor}
+\usepackage[a4paper,margin=2.5cm]{geometry} 
+%\usepackage{setspace}
+%\usepackage{float}
+%\usepackage{titletoc}
+%\usepackage{titlesec}
+\usepackage{graphicx}
+%\usepackage{wrapfig}
+%\usepackage{mathptmx} \usepackage[bf]{caption} \usepackage{lineno}
+\usepackage{url} \usepackage{xpatch} \usepackage{array}
+%\usepackage{microtype} \usepackage{relsize}
+%\usepackage{footnote}
+%\usepackage{tikz}
+%\usepackage{ntheorem}
+%\usepackage{subcaption}
+%\setlength{\parskip}{3pt}
+%\usepackage{multicol}
+\usepackage{hyperref}
+\usepackage{csquotes}
+%\usepackage{colortbl}
+%\usepackage{pifont}
+%\usepackage{multirow}
+%\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage{pgfplots}
+%\usepackage{enumitem}
+\usepackage{multicol} 
+
+\usepackage[citestyle=numeric,bibstyle=numeric,sorting=nyt,maxbibnames=9]{biblatex}
+\addbibresource{cite.bib} 
+
+
+
+
+
+
+
+%formatting
+\setlength\parindent{0pt} % sets indent to zero
+\setlength{\parskip}{10pt} % changes vertical space between paragraphs
+\renewcommand{\arraystretch}{1.2}
+
+\begin{document}
+\begin{titlepage}
+\input{titlepage}\clearpage
+\end{titlepage}
+\tableofcontents
+\clearpage
+
+\section{Introduction}
+
+Representing semiparametric models as mixed models in order to use their inference especially for the penalty term $\lambda$.
+
+\cite{fahrmeir2013regression}
+
+\cite{kneib2006mixed}
+
+\cite{wood2017generalized}
+
+\cite{wood2011fast}
+
+\section{Semiparametric Regression}
+
+
+\section{Linear Mixed Models}
+
+Linear mixed models are an extension of the linear model $y_i = x^T_i\beta +\epsilon_i$ incorporating so called \textit{random effects} in order to capture correlation in the data \cite{fahrmeir2013regression}. The correlations might stem from repeated measurements in longitudinal models or clustered data in hierarchical models. In the prediction the fixed or population-averaged effects are modelled separately from the random or cluster-specific effects. The \textit{measurement model} is written as follows:
+
+$$y_i = X_i \beta + Z_i b_i + \epsilon_i,$$
+
+where $i$ refers to an individual in a longitudinal model and to a cluster in a
+hierarchical model, $y_i = ( y_{i1},...,y_{in_i} )^T$ is the $n_i \times 1$ vector of responses for the $n_i$ observations for cluster/individual $i$, $X_i = \left[ x_{i1},..., x_{in_i}\right]^T$ is the $n_i \times p$ matrix of the $p$ fixed-effects covariates, $\beta = (\beta_1,...,\beta_p)^T$ is the $p\times1$ vector of parameters for the fixed effects, $Z_i = \left[z_{i1},...,z_{in_i}\right]^T$ is the $n_i\times q$ matrix of $q$ random covariates (typically $Z_i$ is a subvector of $X_i$), $b = (b_1,...,b_q)^T$ is the $q\times1$ vector of parameters for the random effects, and $\epsilon_i = (\epsilon_{i1},...,\epsilon_{in_i})^T$ is the $n_i\times1$ vector of errors. 
+
+A linear mixed model is defined hierarchically in stages: 
+In the \textit{first stage} the response is assumed to depend linearly on fixed and random effects as in the measurement model. Additionally, error terms are assumed to be independent and identically distributed (i.i.d.) $\epsilon_i \sim \mathrm{N}_{n_i}(0,R_i)$ typically with $R_i=\sigma^2 I_{n_i}$. 
+In the \textit{second stage} a distribution is introduced for the random effects reflecting the assumption that individuals/clusters are drawn from the population.
+This distribution can be seen as a Bayesian prior. The convention is to use Gaussian random effects $b_i \sim \mathrm{N}_q(0,D)$ with $(q{+}1)\times (q{+}1)$ covariance matrix $D$. In addition, $b_i$ and $\epsilon_i$ are assumed to be mutually independent. 
+Additional correlation structure can be introduced in the error terms $\epsilon_i \sim \mathrm{N}(0, \Sigma_i)$, especially for longitudinal models as autoregression between the measurements at each point in time.
+
+There are four ways of interpreting a mixed model:
+\begin{itemize}
+\item \textit{classical view}: The random effects reflect that the individuals/clusters are a random sample of a larger population. This view is not always appropriate.
+\item \textit{marginal view}: The random effects generate a general linear
+model with correlated errors.
+\item \textit{Bayesian view}: The random effects distribution is a prior on the random effects.
+\item \textit{penalization view}: The random effects distribution results in a penalty under least squares estimation on the random effects leading to shrinkage towards zero. The intensity of the shrinkage decays with $n$.
+\end{itemize}
+
+The covariance matrix of observations $y_i$ in cluster $i$ is then $V_i = \mathrm{Cov}(y_i) = Z_iDZ_i^T + R_i$ and the covariance matrix for all observations is $V = \mathrm{Cov}(y) = \mathrm{diag}(V_1,...V_n)$.
+The covariance matrix $V$ is unknown as $R_i$ and $D$ are unknown. It can be estimated after $\beta$ using maximum likelihood (ML). An alternative approach is to use the restricted  maximum likelihood  (REML). REML is typically used in linear models to get unbiased estimates. However, it does not generally produce unbiased estimates for mixed models. Nevertheless, it is the method most often used. Here $\beta$ is integrated out of the likelihood corresponding to the Bayesian view of a flat prior on $\beta$. The maximization can be done using Newton-Raphson or Fisher scoring algorithms. The estimates for the coefficients are $\hat{\beta} = (X^T \hat{V}^{-1} X)^{-1} X^T \hat{V}^{-1}y$ and $\hat{b} = \hat{D}Z^T\hat{V}^{-1} (y-X\hat{\beta})$.
+
+
+Several linear mixed models can be differentiated:
+Whereas the \textit{random coefficient model} depicted above estimates both slope and intercept, for the \textit{random intercept model} $Z_ib_i$ is replaced by a single random deviation from the population intercept $b_i \in \mathbb{R}$. The \textit{variance components model} assumes that the components of $b_i$ are independent resulting in a diagonal matrix $D$.
+\textit{Multilevel mixed models} have more than one cluster affilitation for each observation and \textit{nested mixed models} as a subgroup of these have hierarchical cluster affiliations.
+
+
+\section{Semiparametric Models As Mixed Models}
+
+\section{Inference}
+
+\section{Comparison To Other Methods}
+
+\section{Conclusion}
+
+
+
+
+
+\newpage
+\printbibliography
+
+\end{document}
