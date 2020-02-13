@@ -216,24 +216,74 @@ Whereas the \textit{random coefficient model} depicted above estimates both slop
 \textit{Multilevel mixed models} have more than one cluster affilitation for each observation and \textit{nested mixed models} as a subgroup of these have hierarchical cluster affiliations.
 
 
-\section{Semiparametric Models As Mixed Models}\label{representation}
-from here on only matrix notation
+\section{Semiparametric Models As Mixed Models}\label{representation} % 4 Seiten
 
-Erwaehnen, dass man das auch ohne die Decomposition machen kann
+
+Inhalt: 
+1. Idee mit empirical bayes approach und ieinem prior für xi
+2. Wir sehen, Problem mit rank deficiency, lösung decomposition
+3. decomposition mit Bildern erklären
+4. Wie kommen wir mit decomposition zu mixed model, requirements (REQ 2 IST PROBLEM)
+5. Beweis, dass wir diese Requirements immer erfüllen können
+6. So kommen wir zu unserem neuen log-posterior, wir sehen: variance components model
+7. Erwaehnen, dass man das auch ohne die Decomposition machen kann
 
 ---------------------------------------------------------------
 
+Empirical Bayes
+
+
+Idea: Use Mixed Model inference: $y = \sum_{j=1}^p \underbrace{V_p \xi_p}_{\text{random effects}} + \overbrace{U \gamma}^{\text{fixed effects}} + \: \epsilon$ 
+
+
+Prior:  $ p(\gamma) \propto \text{const.}$ 
+
+Prior:   $p(\xi_j|\tau_j^2)  \propto \exp\left(-\frac{1}{2\tau^2_j} \xi_j^T\Sigma^{-1}_j \xi_j\right) $  
+
+Posterior: 
+$p(\xi_1, ... \xi_p, \gamma|y) \propto L(y,\xi_1, ... \xi_p, \gamma)\prod_{j=1}^p p(\xi_j|\tau_j^2) $ 
+
+Maximum Likelihood for $\tau_j^2$ (so far treated as fixed):
+$$\max_{\tau_1, ..., \tau_p} \log L(\gamma, \xi_1,...,\xi_p) - \sum_{j=1}^p \underbrace{\frac{1}{2\tau^2_j}}_{\lambda_j} \xi_j^T \underbrace{\Sigma^{-1}_j}_{K_j} \xi_j$$
+
+
+
+
+$\Rightarrow$ Empirical Bayes is equivalent to penalized Maximum Likelihood
+
+%Problem: improper priors therefore reparameterize?
+
+
+Mixed Model Representation
+% equivalent to variance components model (components of b_i are independent)
+
+Idea: Use Mixed Model inference: $y = \sum_{j=1}^p \underbrace{V_p \xi_p}_{\text{random effects}} + \overbrace{U \gamma}^{\text{fixed effects}} + \: \epsilon$
 
 
 
 
 
+Problem: $K_j$ as precision matrix is problematic as $K_j$ is often rank deficient, 
+e.\,g. $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$ $\rightarrow$ $\xi_1$ not penalized:
+
+The Gaussian prior $p(\xi_j|\tau_j^2) \propto \exp\left(-\frac{1}{2\tau^2_j} \xi_j^TK_j \xi_j\right)$ is improper.
 
 
 
 
+Solution: Separate $\xi_j$ into $\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$:
 
-----------------------------------------------------------------
+\begin{itemize} 
+\item $\beta$: non-penalized parts with a flat prior 
+$\text{dim}(\beta_j) = \text{dim}(\xi_j) {-} \text{rank}(K_j)$  
+
+\item $b$: penalized parts with a proper (Gaussian) prior 
+
+$\text{dim}(b_j) =\text{rank}(K_j)$
+\end{itemize}
+
+
+Mixed Model Representation
 
 \begin{figure}
 \centering
@@ -253,6 +303,76 @@ Erwaehnen, dass man das auch ohne die Decomposition machen kann
 \end{figure}
 
 
+
+Decomposition $\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$: 
+
+\begin{align*}
+y = \sum_{j=1}^p V_j\\
+ \xi_j + U\gamma \\
+\overbrace{(\tilde{X}_j \beta_j + \tilde{Z}_j b_j)}^{\xi_j} + U\gamma \\
+\overbrace{(\tilde{X}_j \beta_j + \tilde{Z}_j b_j)}^{\xi_j} + U\gamma =   X\beta + Zb 
+\end{align*}
+
+
+
+
+
+\begin{align*}
+\beta &:= (\beta_1^T,..., \beta_p^T, \gamma^T) \\
+b &:= (b_1^T,...,b_p^T) \\
+Z &:= V_j \tilde{Z}_j \\
+X &:= (V_j \tilde{X}_j, U)
+\end{align*}
+
+
+Requirements:
+
+\begin{enumerate}
+\item 1-to-1 transformation: matrix $(\tilde{X}_j \:\:  \tilde{Z}_j)$ has full rank 
+\item $\tilde{X}_j$ and $\tilde{Z}_j$ are orthogonal: $\tilde{X}_j^T \tilde{Z}_j = 0$
+\item $\beta_j$ not penalized by $K_j$: $\tilde{X}_j^T K_j \tilde{X}_j = 0$
+\item Gaussian prior for $b_j$: $\tilde{Z}_j^T K_j \tilde{Z}_j = I_{kj}$
+\end{enumerate}
+
+
+
+Choosing $\tilde{X}_j$ and $\tilde{Z}_j$ for Mixed Model Representation
+
+
+\begin{itemize}
+\item $\tilde{X}_j$ is a basis of the null space of $K_j$ (condition 3)
+\item $\tilde{Z}_j =L_j (L_j^T L_j)^{-1}$ with $K_j =L_j L_j^T$ (conditions 1 and 4)
+\item Choose $L_j$ s.\,t.\ $L_j^T\tilde{X}_j = 0$ and $\tilde{X}_jL_j^T = 0$ (condition 2)
+
+e.\,g.\ spectral decomposition: 
+$K_j = \Gamma_j \Lambda_j \Gamma^T$, so $L_j = \Gamma \Lambda_j^{1/2}$
+\end{itemize}
+
+
+Mixed Model Representation
+
+log-Prior:
+
+\begin{align*}
+\log p(\xi_j|\tau_j^2)  \propto -\frac{1}{2\tau^2_j} \xi_j^TK_j \xi_j \\
+= -\frac{1}{2\tau_j^2} b_j^T b_j
+\end{align*}
+
+
+
+$\Rightarrow p(\beta) \propto \text{const.}$
+
+$\Rightarrow p(b_j) \sim N(0,\tau_j^2I_{kj})$
+
+
+
+log-Posterior:  $$l_p(\beta,b|y) = l(y,\beta,b) - \sum_{j=1}^p \overbrace{\frac{1}{2\tau_j^2}}^{=\lambda} b_j^T  b_j $$
+
+----------------------------------------------------------------
+
+
+
+
 \cite{fahrmeir2013regression}
 
 \cite{kneib2006mixed}
@@ -262,10 +382,76 @@ Erwaehnen, dass man das auch ohne die Decomposition machen kann
 \cite{wood2011fast}
 
 
-\section{Inference}
+\section{Inference} % 3 Seiten
 Although mixed model inference is not the focus of this report, as it is the reason we are doing the decomposition and stuff, it will be discussed here although rather briefly.
 
+Inhalt
+0. das was drüber steht
+1. beta und b
+2. variance (RE)ML
+3. variance estimates mit newton raphson
+4. new method mit nested iteration im vergleich zu vorher
 
+------------------------------------------------------------
+
+
+Estimates $\hat{\beta}$ and $\hat{b}$
+
+In order to maximize the (log-)Posterior (equivalent to ML), derive estimates for $\beta$ and $b$ simultaneously based on known $\sigma^2$ and $\tau^2$.
+
+
+Mixed Model equations:
+$$\overbrace{\begin{pmatrix}
+X^TWX & X^TWZ \\
+Z^TWX & Z^TWZ + Q^{-1}
+\end{pmatrix}}^{\text{Fisher information}}
+\begin{pmatrix}
+\hat{\beta} \\
+\hat{b}
+\end{pmatrix} =
+\begin{pmatrix}
+X^TWy \\
+Z^TWy
+\end{pmatrix}$$
+
+ with $W=\text{diag}(\sigma^2)$ and $Q=\text{blockdiag}(\tau_1^2I_{k1},..., \tau_p^2I_{kp})$
+
+
+Variance Estimates
+
+Maximum Likelihood (integrate $b$ out)
+
+\begin{itemize}
+\item uses (partially) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$
+
+\begin{enumerate}
+\item Derive $\hat{\beta}$ analytically
+\item Plug in to get profile likelihood for $\tau^2$ and $\sigma^2$
+\item Maximize numerically
+\end{enumerate}
+
+\item estimates variance components of posterior mode
+\end{itemize}
+
+
+
+Restricted ML (integrate $b$ and $\beta$ out)
+
+\begin{itemize}
+\item directly uses marginal distribution of $y$
+
+\item Advantages over ML:
+\begin{itemize}
+\item[$+$] considers loss of degrees of freedom due to estimation of $\beta$ 
+\item[$+$] estimates mode of the marginal posterior for the variances
+\end{itemize}
+\end{itemize}
+
+
+
+Variance Estimates $\hat{\sigma}^2$ and $\hat{\tau}^2$
+
+Maximize the restricted likelihood (REML) using Newton-Raphson:
 
 \begin{figure}
 \begin{center}
@@ -276,12 +462,72 @@ Although mixed model inference is not the focus of this report, as it is the rea
 \end{figure}
 
 
-\section{Comparison To Other Methods}
 
-\section{Conclusion}
+
+
+
+(RE)ML estimation
+
+Single iterations (old)
+\begin{itemize}
+\item \textbf{Update  $\boldsymbol{\hat{\beta}}$ and $\boldsymbol{\hat{b}}$} given the current $\hat{\lambda}$
+\item \textbf{Update $\boldsymbol{\hat{\lambda}}$} using Fisher-Scoring (or Newton-Raphson)
+
+$\rightarrow$ $\mathcal{V}_{\hat{\beta}, \hat{b}}(\lambda)$ depends on $\hat{\beta}$ and $\hat{b}$
+\end{itemize}
+$\Rightarrow$ Convergence is not guaranteed
+
+Nested iterations (new)
+\begin{itemize}
+\item Update $\boldsymbol{\hat{\lambda}}$ using Newton-Raphson
+
+\begin{itemize}
+\item for each step: estimate $\boldsymbol{\hat{\beta}_\lambda}$ and $\boldsymbol{\hat{b}_\lambda}$
+\end{itemize}
+
+
+$\rightarrow \mathcal{V}(\lambda)$ depends on $\beta$ and $b$ only via $\hat{\beta}_\lambda$ and $\hat{b}_\lambda$
+
+\item Update $\boldsymbol{\hat{\beta}}$ and $\boldsymbol{\hat{b}}$ given the current $\hat{\lambda}$
+
+\end{itemize}
+$\Rightarrow$ Convergence is guaranteed (under mild regulatory conditions)
+
+
+------------------------------------------------------------
+
+
+
+
+\section{Comparison To Other Methods} % eine Seite
+
+
+Fully Bayesian approach (MCMC)
+\begin{itemize}
+\item[$+$] no reparameterization needed
+\item[$-$] Markov chain convergence is difficult to determine
+\item[$-$] how to choose hyperpriors?
+\end{itemize}
+
+Prediction error methods (AIC, GCV)
+\begin{itemize}
+\item[$+$] better prediction error performance 
+\item[$-$] worse resistance to overfit
+\item[$-$] higher smoothing parameter variability
+\item[$-$] increased tendency to multiple minima
+\item[$\rightarrow$] \textit{more on that next week}
+\end{itemize}
+
+
+\section{Conclusion} % halbe Seite
 Talk about tpr und andere spline methods maybe
 
-
+\begin{itemize}
+\item Semiparametric models can be \textbf{written as mixed models}, which enables an efficient way to estimate the penalty term $\lambda$.
+\item In order to get a proper random effects distribution, the flexible parameters have to be \textbf{separated} into sets of parameters with \textbf{flat priors} and sets with \textbf{proper priors}.
+\item The penalty term  is proportional to the inverse of the prior variance: $\mathbf{\boldsymbol{\lambda} \boldsymbol{\propto} \frac{1}{\boldsymbol{\tau}^2}}$
+\item For good results in mixed model inference, the \textbf{penalty term} has to be estimated in a \textbf{nested iteration} setup with the other parameters.
+\end{itemize}
 
 
 \newpage
