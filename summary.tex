@@ -27,6 +27,7 @@
 %\usepackage{xcolor}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{amsthm}
 %\usepackage{pgfplots}
 %\usepackage{enumitem}
 \usepackage{multicol} 
@@ -45,16 +46,56 @@
 \setlength{\parskip}{10pt} % changes vertical space between paragraphs
 \renewcommand{\arraystretch}{1.2}
 
+
+
 \begin{document}
 \begin{titlepage}
 \input{titlepage}\clearpage
 \end{titlepage}
+
+\pagenumbering{Roman}
+\setcounter{page}{2}
 \tableofcontents
 \clearpage
 
+\pagenumbering{arabic}
 \section{Introduction}
 
-Representing semiparametric models as mixed models in order to use their inference especially for the penalty term $\lambda$.
+Flexible regression is a powerful extension to the classical linear model as it allows to estimate non-linear effects. However, the additional flexibility also introduces more room for errors as the typical bias-variance-tradeoff becomes a focal point of estimation. The function can be chosen to be close to the data and therefore have a high variance or a more smooth fit can be chosen increasing the risk of introducing bias by restricting the fit too much. Choosing the "wiggliness" of a fit is at the core of fitting a flexible regression.
+
+An example for a flexible regression is the truncated power basis (TPB), where the dependent variable $y$ is estimated based on the independent variable $x$ using the model equation
+$$y_i = 
+ \theta_0 + \theta_1x_i + \theta_2x_i^2 + ... + \theta_dx_i^d + \sum_{k=1}^K \theta_{dk}(x_i-\kappa_k)_+^d + \epsilon_i,$$
+ 
+ where $\theta_j$ for $j= 1,...,d$ and $\theta_{dk}$ are the parameters to be estimated and $\kappa_k$ represent knots along the interval $]x_{min},x_{max}[$ which are chosen beforehand \cite{ruppert2003semiparametric, wand2003smoothing}.
+ 
+  A linear TPB with two knots is represented by the model equation
+ 
+ $$y_i = 
+ \theta_0 + \theta_1x_i +  \theta_{21}(x_i-\kappa_1)_+ + \theta_{22}(x_i-\kappa_2)_+ + \epsilon_i.$$
+ 
+ The parts of the equation that are multiplied with a coefficient are called basis functions. 
+An example of a linear TPB can be seen in figure \ref{tpb} with the grey lines depicting the basis functions and the black line the fitted model.
+ 
+This example shows off the fact that the first two basis functions induce a linear fit and the truncated basis functions then add a deviation from that linear fit. Therefore, only the truncated basis functions really introduce wiggliness into the fit. 
+Their effect also depends on $i$ as they are zero for $x<\kappa_k$ and only impact the model for parts of the population. 
+In order to get a smooth function, it is therefore sensible to penalize the truncated basis functions while leaving the other basis functions unpenalized. This penalty term in the maximum likelihood estimation can be seen as the result of a prior distribution or random effects distribution. 
+
+It follows, that the TPB can be understood as a mixed model where $\theta_j$ are the parameters for the fixed effects and $\theta_{dk}$ the parameters for the random effects \cite{ruppert2003semiparametric}. Representing the TPB as a mixed model introduces the opportunity to use mixed model inference. This is especially useful in determining the wiggliness of a flexible regression fit.
+
+\begin{figure}
+\begin{center}
+\includegraphics{Images/tpb_report.pdf}
+\end{center}
+\vspace{-2em}
+\caption[caption]{The basis functions of a linear TPB with two knots and a possible fit with $y_i = 1 + 1 \cdot x_i +  2 \cdot(x_i-\kappa_1)_+ - 4\cdot (x_i-\kappa_2)_+ + \epsilon_i.$}\label{tpb}
+\end{figure}
+
+However, it remains to be proven that this works for other types of flexible regressions as well and not only the TPB. 
+In this work, it will be shown that all penalized regression splines can be interpreted as mixed models. The ensuing chapter is dedicated to flexible regression and especially penalized regression splines. Subsequently, a summary of linear mixed models will be presented. Afterwards, a method of representing all penalized regression splines as mixed models is stated followed by some insights into inference for these models. This report ends with a comparison to other methods and a conclusion.
+
+
+\section{Flexible Regression}
 
 \cite{fahrmeir2013regression}
 
@@ -64,7 +105,13 @@ Representing semiparametric models as mixed models in order to use their inferen
 
 \cite{wood2011fast}
 
-\section{Semiparametric Regression}
+What kind of flexible regression? The one's with penalty
+
+iwie einheitlicher
+
+Representing semiparametric models as mixed models in order to use their inference especially for the penalty term $\lambda$.
+
+Explain how penalty is related to mixed models
 
 
 \section{Linear Mixed Models}
@@ -74,33 +121,37 @@ Linear mixed models are an extension of the linear model $y_i = x^T_i\beta +\eps
 $$y_i = X_i \beta + Z_i b_i + \epsilon_i,$$
 
 where $i$ refers to an individual in a longitudinal model and to a cluster in a
-hierarchical model, $y_i = ( y_{i1},...,y_{in_i} )^T$ is the $n_i \times 1$ vector of responses for the $n_i$ observations for cluster/individual $i$, $X_i = \left[ x_{i1},..., x_{in_i}\right]^T$ is the $n_i \times p$ matrix of the $p$ fixed-effects covariates, $\beta = (\beta_1,...,\beta_p)^T$ is the $p\times1$ vector of parameters for the fixed effects, $Z_i = \left[z_{i1},...,z_{in_i}\right]^T$ is the $n_i\times q$ matrix of $q$ random covariates (typically $Z_i$ is a subvector of $X_i$), $b = (b_1,...,b_q)^T$ is the $q\times1$ vector of parameters for the random effects, and $\epsilon_i = (\epsilon_{i1},...,\epsilon_{in_i})^T$ is the $n_i\times1$ vector of errors. 
+hierarchical model, $y_i = ( y_{i1},...,y_{in_i} )^T$ is the $n_i \times 1$ vector of responses for the $n_i$ observations for cluster/individual $i$, $X_i = \left[ x_{i1},..., x_{in_i}\right]^T$ is the $n_i \times p$ matrix of the $p$ fixed-effects covariates, $\beta = (\beta_1,...,\beta_p)^T$ is the $p\times1$ vector of parameters for the fixed effects, $Z_i = \left[z_{i1},...,z_{in_i}\right]^T$ is the $n_i\times q$ matrix of $q$ random covariates (often $Z_i$ is a subvector of $X_i$), $b = (b_1,...,b_q)^T$ is the $q\times1$ vector of parameters for the random effects, and $\epsilon_i = (\epsilon_{i1},...,\epsilon_{in_i})^T$ is the $n_i\times1$ vector of errors. 
 
-A linear mixed model is defined hierarchically in stages: 
+A linear mixed model can be defined hierarchically in stages: 
 In the \textit{first stage} the response is assumed to depend linearly on fixed and random effects as in the measurement model. Additionally, error terms are assumed to be independent and identically distributed (i.i.d.) $\epsilon_i \sim \mathrm{N}_{n_i}(0,R_i)$ typically with $R_i=\sigma^2 I_{n_i}$. 
 In the \textit{second stage} a distribution is introduced for the random effects reflecting the assumption that individuals/clusters are drawn from the population.
 This distribution can be seen as a Bayesian prior. The convention is to use Gaussian random effects $b_i \sim \mathrm{N}_q(0,D)$ with $(q{+}1)\times (q{+}1)$ covariance matrix $D$. In addition, $b_i$ and $\epsilon_i$ are assumed to be mutually independent. 
-Additional correlation structure can be introduced in the error terms $\epsilon_i \sim \mathrm{N}(0, \Sigma_i)$, especially for longitudinal models as autoregression between the measurements at each point in time.
+Additional correlation structure can be introduced in the error terms $\epsilon_i \sim \mathrm{N}(0, \Sigma_i)$.
+
+
+
+The maximum likelihood estimates for the coefficients are $\hat{\beta} = (X^T \hat{V}^{-1} X)^{-1} X^T \hat{V}^{-1}y$ and $\hat{b} = \hat{D}Z^T\hat{V}^{-1} (y-X\hat{\beta})$, with the covariance matrix of observations $y_i$ in cluster $i$ as $V_i = \mathrm{Cov}(y_i) = Z_iDZ_i^T + R_i$ and the covariance matrix for all observations $V = \mathrm{Cov}(y) = \mathrm{diag}(V_1,...V_n)$.
+The covariance matrix $V$ is unknown as $R_i$ and $D$ are unknown. $V$ can be estimated  using maximum likelihood (ML) if $\beta$ or its estimate $\hat{\beta}$ is known. An alternative approach is to use the restricted  maximum likelihood  (REML). REML is typically used in linear models to get unbiased estimates. However, it does not generally produce unbiased estimates for mixed models. Nevertheless, it is the method most often used. Here $\beta$ is integrated out of the likelihood corresponding to the Bayesian view of a flat prior on $\beta$. The maximization can be done using Newton-Raphson or Fisher scoring algorithms. 
 
 There are four ways of interpreting a mixed model:
 \begin{itemize}
-\item \textit{classical view}: The random effects reflect that the individuals/clusters are a random sample of a larger population. This view is not always appropriate.
+\item \textit{classical view}: The random effects reflect that the individuals/clusters are a random sample of a larger population. This view is not always appropriate, e.\,g., if one has data on all individuals/clusters of the given population.
 \item \textit{marginal view}: The random effects generate a general linear
 model with correlated errors.
 \item \textit{Bayesian view}: The random effects distribution is a prior on the random effects.
-\item \textit{penalization view}: The random effects distribution results in a penalty under least squares estimation on the random effects leading to shrinkage towards zero. The intensity of the shrinkage decays with $n$.
+\item \textit{penalization view}: The random effects distribution results in a penalty on the random effects under least squares and maximum likelihood estimation inducing to shrinkage towards zero. The intensity of the shrinkage decays with $n$.
 \end{itemize}
-
-The covariance matrix of observations $y_i$ in cluster $i$ is then $V_i = \mathrm{Cov}(y_i) = Z_iDZ_i^T + R_i$ and the covariance matrix for all observations is $V = \mathrm{Cov}(y) = \mathrm{diag}(V_1,...V_n)$.
-The covariance matrix $V$ is unknown as $R_i$ and $D$ are unknown. It can be estimated after $\beta$ using maximum likelihood (ML). An alternative approach is to use the restricted  maximum likelihood  (REML). REML is typically used in linear models to get unbiased estimates. However, it does not generally produce unbiased estimates for mixed models. Nevertheless, it is the method most often used. Here $\beta$ is integrated out of the likelihood corresponding to the Bayesian view of a flat prior on $\beta$. The maximization can be done using Newton-Raphson or Fisher scoring algorithms. The estimates for the coefficients are $\hat{\beta} = (X^T \hat{V}^{-1} X)^{-1} X^T \hat{V}^{-1}y$ and $\hat{b} = \hat{D}Z^T\hat{V}^{-1} (y-X\hat{\beta})$.
 
 
 Several linear mixed models can be differentiated:
-Whereas the \textit{random coefficient model} depicted above estimates both slope and intercept, for the \textit{random intercept model} $Z_ib_i$ is replaced by a single random deviation from the population intercept $b_i \in \mathbb{R}$. The \textit{variance components model} assumes that the components of $b_i$ are independent resulting in a diagonal matrix $D$.
+Whereas the \textit{random coefficient model} depicted above estimates both slope and intercept, for the \textit{random intercept model} $Z_ib_i$ is replaced by a single random deviation per cluster/individual from the population intercept $b_i \in \mathbb{R}$. The \textit{variance components model} assumes that the components of $b_i$ are independent resulting in a diagonal matrix $D$.
 \textit{Multilevel mixed models} have more than one cluster affilitation for each observation and \textit{nested mixed models} as a subgroup of these have hierarchical cluster affiliations.
 
 
 \section{Semiparametric Models As Mixed Models}
+
+Erwaehnen, dass man das auch ohne die Decomposition machen kann
 
 \section{Inference}
 
