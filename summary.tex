@@ -59,20 +59,20 @@
 \clearpage
 
 \pagenumbering{arabic}
-\section{Introduction}
+\section{Introduction}\label{intro}
 
-Flexible regression is a powerful extension to the classical linear model as it allows to estimate non-linear effects. However, the additional flexibility also introduces more room for errors as the typical bias-variance-tradeoff becomes a focal point of estimation. The function can be chosen to be close to the data and therefore have a high variance or a more smooth fit can be chosen increasing the risk of introducing bias by restricting the fit too much. Choosing the "wiggliness" of a fit is at the core of fitting a flexible regression.
+Flexible regression is a powerful extension to the classical linear model as it allows to estimate non-linear effects. However, the additional flexibility also introduces more room for errors as the typical bias-variance tradeoff becomes a focal point of estimation. The function can be chosen to be close to the data and therefore have a high variance or a more smooth fit can be chosen increasing the risk of introducing bias by restricting the fit too much. Choosing the "wiggliness" of a fit is at the core of fitting a flexible regression.
 
 An example for a flexible regression is the truncated power basis (TPB), where the dependent variable $y$ is estimated based on the independent variable $x$ using the model equation
-$$y_i = 
- \theta_0 + \theta_1x_i + \theta_2x_i^2 + ... + \theta_dx_i^d + \sum_{k=1}^K \theta_{dk}(x_i-\kappa_k)_+^d + \epsilon_i,$$
+$$\hat{y}_i = 
+ \theta_0 + \theta_1x_i + \theta_2x_i^2 + ... + \theta_dx_i^d + \sum_{k=1}^K \theta_{dk}(x_i-\kappa_k)_+^d,$$
  
  where $\theta_j$ for $j= 1,...,d$ and $\theta_{dk}$ are the parameters to be estimated and $\kappa_k$ represent knots along the interval $]x_{min},x_{max}[$ which are chosen beforehand \cite{ruppert2003semiparametric, wand2003smoothing}.
  
   A linear TPB with two knots is represented by the model equation
  
- $$y_i = 
- \theta_0 + \theta_1x_i +  \theta_{21}(x_i-\kappa_1)_+ + \theta_{22}(x_i-\kappa_2)_+ + \epsilon_i.$$
+ $$\hat{y}_i = 
+ \theta_0 + \theta_1x_i +  \theta_{21}(x_i-\kappa_1)_+ + \theta_{22}(x_i-\kappa_2)_+.$$
  
  The parts of the equation that are multiplied with a coefficient are called basis functions. 
 An example of a linear TPB can be seen in figure \ref{tpb} with the grey lines depicting the basis functions and the black line the fitted model.
@@ -85,36 +85,103 @@ It follows, that the TPB can be understood as a mixed model where $\theta_j$ are
 
 \begin{figure}
 \begin{center}
-\includegraphics{Images/tpb_report.pdf}
+\includegraphics[width=0.8\textwidth]{Images/tpb_report.pdf}
 \end{center}
 \vspace{-2em}
-\caption[caption]{The basis functions of a linear TPB with two knots and a possible fit with $y_i = 1 + 1 \cdot x_i +  2 \cdot(x_i-\kappa_1)_+ - 4\cdot (x_i-\kappa_2)_+ + \epsilon_i.$}\label{tpb}
+\caption[caption]{The basis functions of a linear TPB with two knots and a possible fit with $\hat{y}_i = 1 + 1 \cdot x_i +  2 \cdot(x_i-\kappa_1)_+ - 4\cdot (x_i-\kappa_2)_+.$}\label{tpb}
 \end{figure}
 
 However, it remains to be proven that this works for other types of flexible regressions as well and not only the TPB. 
-In this work, it will be shown that all penalized regression splines can be interpreted as mixed models. The ensuing chapter is dedicated to flexible regression and especially penalized regression splines. Subsequently, a summary of linear mixed models will be presented. Afterwards, a method of representing all penalized regression splines as mixed models is stated followed by some insights into inference for these models. This report ends with a comparison to other methods and a conclusion.
+In this work, it will be shown that all penalized regression splines can be interpreted as mixed models. The ensuing chapter is dedicated to flexible regression and especially penalized regression splines. Subsequently, a summary of linear mixed models will be presented. Afterwards, a method of representing all penalized regression splines as mixed models is stated followed by some insights into inference for these models. This report closes with a comparison to other methods and a conclusion.
 
 
 \section{Flexible Regression}
 
-\cite{fahrmeir2013regression}
+One the most commonly used flexible regression approaches is the \textit{penalized regression spline} which is also the focus of this report \cite{fahrmeir2013regression, ruppert2003semiparametric, wood2017generalized}. In order to introduce this modelling approach, three components are necessary: (flexible) regression, splines, and a penalty. These three parts will be explained in the following.
 
-\cite{kneib2006mixed}
+In nonparametric additive models, the linear parts of the equation are replaced by smooth functions $f_j(.)$ which take the input $\nu_{ij}$, a subset of the features, often just one feature per smooth function, for $j = 1,...,p$ (equation \ref{f}). 
+The different smooth functions are then added together, hence the name ``additive model''.
+These smooth functions can also be expressed as vectors $v^T_{ij}$  multiplied with their corresponding parameters $\xi_j$ (equation \ref{vector}). These vectors can be merged into matrices when the index $i$ is dropped in order to shorten the notation (equation \ref{matrix}).
 
-\cite{wood2017generalized}
+\begin{align}
+\hat{y}_i &= f_1(\nu_{i1}) + ... + f_p(\nu_{ip})\label{f}\\
+&=  v^T_{i1}\xi_1 + ... + v^T_{ip}\xi_p\label{vector} \\
+&= V_1\xi_1 + ... + V_p\xi_p = \sum_{j=1}^p V_j\xi_j \label{matrix}
+\end{align}
 
-\cite{wood2011fast}
+Semiparametric additive models differ from nonparametric ones by including the linear effects, i.\,e., intercept and slope, in a separate term as depicted in equations \ref{f_semi} to \ref{matrix_semi}.
 
-What kind of flexible regression? The one's with penalty
+\begin{align}
+\hat{y}_i &= f_1(\nu_{i1}) + ... + f_p(\nu_{ip})+ u^T_i\gamma\label{f_semi}\\
+&=  v^T_{i1}\xi_1 + ... + v^T_{ip}\xi_p+ u^T_i\gamma\label{vector_semi} \\
+&= V_1\xi_1 + ... + V_p\xi_p + U\gamma= \sum_{j=1}^p V_j\xi_j + U\gamma\label{matrix_semi}
+\end{align}
 
-iwie einheitlicher
+In the following, the matrix notation will be used, as it is the most concise.
+The report later on focusses on semiparametric regression as opposed to nonparametric regression since it is much easier to see how the method presented in section \ref{representation} needs to be adjusted for a missing linear component than it is vice versa.
 
-Representing semiparametric models as mixed models in order to use their inference especially for the penalty term $\lambda$.
+After the general model structure is clear, the next step is choosing the matrices $V_j$.
+The TPB example in section \ref{intro} already gave an example of a possible choice for that. More generally, the entries in the matrices $V_j$ consist of so-called basis functions. A set of basis functions is called a spline. For univariate semiparametric regression with $l$ basis function, a regression spline equation can be depicted as   
 
-Explain how penalty is related to mixed models
+$$\hat{y} = V\xi + U\gamma 
+= \begin{pmatrix}
+b_1(x_1) & \dots & b_l(x_1) \\
+ \vdots  & \ddots & \vdots \\
+b_1(x_n) & ... & b_l(x_n)
+\end{pmatrix} 
+\begin{pmatrix}
+\xi_1 \\
+ \vdots   \\
+\xi_l 
+\end{pmatrix} 
++ 
+\begin{pmatrix}
+1 &  x_1 \\
+ \vdots & \vdots \\
+1 & x_n
+\end{pmatrix} 
+\begin{pmatrix}
+\gamma_1 \\
+\gamma_2 
+\end{pmatrix},
+$$
+
+with basis functions $b_1(.), ..., b_l(.)$. There are different splines available, for example, natural cubic splines or B-splines. The latter are characterized as peicewise polynomial segments joined together smoothly at knots. The basis functions for a cubic B-spline are depicted in figure \ref{bsplines}. B-splines are nonparametric as they do not include a linear component in their setup. They are a popular choice for basis functions as their basis functions are each only non-zero for a small part of the possible values for $x$, which makes them numerically more stable.
+
+%B-Spline
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{Images/bspline_report}
+\end{center}
+\vspace{-2em}
+\caption[caption]{Basis functions of a cubic B-spline}\label{bsplines}
+\end{figure}
+
+
+As already mentioned, the bias-variance tradeoff is at the heart of flexible regression. For a given data situation, many possible fits from extremely smooth to very wiggly can be made, two extremes are illustrated in figure \ref{wiggly}. The question is how do we control the bias and variance in a flexible regression setup. So far it can only be controlled by the number of basis functions, which makes adjustments later on really tedious. Instead, the number of basis functions is set as ``enough'' and a penalty is added to the log-likelihood in order to induce shrinkage in the parameters, therefore keeping the wiggliness low. In a semiparametric additive model, the penalty leads to a penalized likelihood as depicted in equation \ref{pen1} with $\lambda$ as the penalty term controlling the intensity of the penalty and the penalty itself being an integral over the curvature, i.\,e., wiggliness or squared second derivative of the fit. As the second derivative of the fit is difficult to determine, a penalty matrix $K$ can be constructed which penalizes the curvature as well leading to equation \ref{pen2}. 
+
+\begin{align}
+l_{pen}(\xi,\gamma, \lambda) &=  \log L(\xi, \gamma) + \lambda \int\limits_{x_{min}}^{x_{max}} \left[ f''(x)\right]^2dx \label{pen1}\\
+ &= \log L(\xi, \gamma) + \lambda \xi^T K \xi\label{pen2}
+\end{align}
+
+The choice of $K$ depends on the spline used. In the case of B-splines, first order differences, with $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$, are a popular choice. These exploit the fact that using the same value for consecutive $\xi_j$ will result in a horizontal line representing the maximal penalty. First order differences penalize how much each $\xi_j$ can deviate from the one before, therefore controlling the wiggliness of the fit.
+
+Using a penalized regression spline means the wiggliness of the fit can be easily controlled by adjusting the parameter $lambda$. The remaining problem is how do we determine $\lambda$? This is where mixed models come into play. If we can represent a penalized regression spline as a mixed model, we can use its inference methods to derive an optimal $\lambda$.
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.6\textwidth]{Images/wiggly_report}
+\end{center}
+\vspace{-2em}
+\caption[caption]{Bias-variance tradeoff in flexible regression fits: low bias/high variance (dark grey), high bias/low variance (light grey)}\label{wiggly}
+\end{figure}
+
 
 
 \section{Linear Mixed Models}
+both notation with i and matrix notation
 
 Linear mixed models are an extension of the linear model $y_i = x^T_i\beta +\epsilon_i$ incorporating so called \textit{random effects} in order to capture correlation in the data \cite{fahrmeir2013regression}. The correlations might stem from repeated measurements in longitudinal models or clustered data in hierarchical models. In the prediction the fixed or population-averaged effects are modelled separately from the random or cluster-specific effects. The \textit{measurement model} is written as follows:
 
@@ -149,16 +216,70 @@ Whereas the \textit{random coefficient model} depicted above estimates both slop
 \textit{Multilevel mixed models} have more than one cluster affilitation for each observation and \textit{nested mixed models} as a subgroup of these have hierarchical cluster affiliations.
 
 
-\section{Semiparametric Models As Mixed Models}
+\section{Semiparametric Models As Mixed Models}\label{representation}
+from here on only matrix notation
 
 Erwaehnen, dass man das auch ohne die Decomposition machen kann
 
+---------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+----------------------------------------------------------------
+
+\begin{figure}
+\centering
+\hspace{-5.5em}
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=1.2\linewidth]{Images/priorispenalty_lowvariance_report}
+  %\hspace{2em}
+\end{minipage}%
+\hspace{-2em}
+\begin{minipage}{.5\textwidth}
+  \centering
+  \includegraphics[width=1.2\linewidth]{Images/priorispenalty_highvariance_report}
+\end{minipage}
+\vspace{-1em}
+\caption[caption]{B-Spline basis functions}\label{bsplines}
+\end{figure}
+
+
+\cite{fahrmeir2013regression}
+
+\cite{kneib2006mixed}
+
+\cite{wood2017generalized}
+
+\cite{wood2011fast}
+
+
 \section{Inference}
+Although mixed model inference is not the focus of this report, as it is the reason we are doing the decomposition and stuff, it will be discussed here although rather briefly.
+
+
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=0.55\textwidth]{Images/newton_report}
+\end{center}
+\vspace{-2em}
+\caption[caption]{Newton-Raphson procedure}\label{newton}
+\end{figure}
+
 
 \section{Comparison To Other Methods}
 
 \section{Conclusion}
-
+Talk about tpr und andere spline methods maybe
 
 
 
