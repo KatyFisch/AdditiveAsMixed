@@ -124,14 +124,14 @@ y&= V_1\xi_1 + ... + V_p\xi_p + U\gamma +\epsilon= \sum_{j=1}^p V_j\xi_j + U\gam
 \end{align}
 
 In the following, the matrix notation will be used, as it is the most concise.
-The report later on focusses on semiparametric regression as opposed to nonparametric regression, since it is much easier to deduce how the method presented in section \ref{representation} needs to be adjusted for a missing linear component than it is vice versa.
+The report later on focusses on semiparametric regression as opposed to nonparametric regression, since it is much easier to deduce how the method presented in Section \ref{representation} needs to be adjusted for a missing linear component than it is vice versa.
 
 \subsection{Splines}
 
 
 
 After the general model structure is cleared up, the next step is choosing the matrices inducing the flexibility of the fit, namely $V_j$.
-The illustration of the TPB in section \ref{intro} already gave an example of a possible choice for that matrix. More generally, the entries in the matrices $V_j$ consist of basis functions. A set of basis functions is called a spline. For univariate semiparametric regression with $l$ basis function, a regression spline equation can be written as   
+The illustration of the TPB in Section \ref{intro} already gave an example of a possible choice for that matrix. More generally, the entries in the matrices $V_j$ consist of basis functions. A set of basis functions is called a spline. For univariate semiparametric regression with $l$ basis function, a regression spline equation can be written as   
 
 $$y = V\xi + U\gamma +\epsilon
 = \begin{pmatrix}
@@ -220,7 +220,7 @@ $$y = X \beta + Z b + \epsilon,$$
 where $y$, $b$, and $\epsilon$ are just the vectors of their respective components $y_i$, $b_i$, and    $\epsilon_i$. $X$ and $Z$ are matrices consisting of $X_i$ and $Z_i$ as their row vectors, respectively. As this is the more concise notation, it will be used from here on.
 
 The maximum likelihood estimates for the coefficients are $\hat{\beta} = (X^T \hat{V}^{-1} X)^{-1} X^T \hat{V}^{-1}y$ and $\hat{b} = \hat{D}Z^T\hat{V}^{-1} (y-X\hat{\beta})$, with the covariance matrix of observations $y_i$ in cluster $i$ as $V_i = \mathrm{Cov}(y_i) = Z_iDZ_i^T + R_i$ and the covariance matrix for all observations $V = \mathrm{Cov}(y) = \mathrm{diag}(V_1,...,V_n)$.
-The covariance matrix $V$ is unknown as $R_i$ and $D$ are unknown. $V$ can be estimated  using maximum likelihood (ML), if $\beta$ or its estimate $\hat{\beta}$ is known. An alternative approach is to use the restricted  maximum likelihood  (REML). REML is typically used in linear models in order to obtain unbiased estimates. However, it does not generally produce unbiased estimates for mixed models. Nevertheless, it is the more popular of the two methods. Here $\beta$ is integrated out of the likelihood corresponding to the Bayesian view of a flat prior on $\beta$. A comparison of ML and REML methods for estimating the variance components including their advantages and disadvanteges will be given in section {varianceestimates}.  The maximization can be done in both cases using Newton-Raphson or Fisher-Scoring algorithms. 
+The covariance matrix $V$ is unknown as $R_i$ and $D$ are unknown. $V$ can be estimated  using maximum likelihood (ML), if $\beta$ or its estimate $\hat{\beta}$ is known. An alternative approach is to use the restricted  maximum likelihood  (REML). REML is typically used in linear models in order to obtain unbiased estimates. However, it does not generally produce unbiased estimates for mixed models. Nevertheless, it is the more popular of the two methods. Here $\beta$ is integrated out of the likelihood corresponding to the Bayesian view of a flat prior on $\beta$. A comparison of ML and REML methods for estimating the variance components including their advantages and disadvanteges will be given in Section {varianceestimates}.  The maximization can be done in both cases using Newton-Raphson or Fisher-Scoring algorithms. 
 
 There are four ways of interpreting a mixed model:
 \begin{itemize}
@@ -252,7 +252,7 @@ In the next step empirical Bayes diverges from a typical Bayes approach by estim
 
 $$\tau^2 = \text{arg}\max_{\tau_1, ..., \tau_p} \log L(\gamma, \xi_1,...,\xi_p) - \sum_{j=1}^p \frac{1}{2\tau^2_j} \xi_j^T \Sigma^{-1}_j \xi_j.$$
 
-This equation shows that empirical Bayes is equivalent to penalized maximum likelihood. This result is not surprising and the equivalence of priors and penalties in estimation has already been addressed in chapter \ref{lmm}. However, it can be seen here, that the term $\frac{1}{2\tau^2_j}$ is equivalent to the penalty term $\lambda$ and the precision matrix $\Sigma^{-1}_j$ is equivalent to the penalty matrix $K_j$ from the penalized regression splines in section \ref{prs}. 
+This equation shows that empirical Bayes is equivalent to penalized maximum likelihood. This result is not surprising and the equivalence of priors and penalties in estimation has already been addressed in Section \ref{lmm}. However, it can be seen here, that the term $\frac{1}{2\tau^2_j}$ is equivalent to the penalty term $\lambda$ and the precision matrix $\Sigma^{-1}_j$ is equivalent to the penalty matrix $K_j$ from the penalized regression splines in Section \ref{prs}. 
 
 This finding seems initially neat as it provides a simple way of choosing the prior in a way that depends on which penalty matrix we chose and also provides a simple way of varying the intensity of the penalization, namely by adjusting $\tau^2$. However, using the penalty matrix $K_j$ as a precision matrix for the Gaussian prior is problematic because $K_j$ is often rank deficient. For example in the case of B-splines with first order differences $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$. As only differences are penalized, the penalty matrix is always missing one to full rank. This implies that the Gaussian prior of $\xi_j$ is improper.
 
@@ -348,9 +348,9 @@ The decomposition shown in this chapter is an illustrative way of explaining the
 
 \section{Inference} % 3 Seiten
 
-Mixed model inference is certainly not the focus of this report, but it is at the core of why the decomposition in the chapter before is done and therefore it will be discussed here although rather briefly. Representing additive models as mixed models is especially useful in determining the penalty term $\lambda$ or $\tau^2$, but it can also be used to derive the other parameters, namely $\beta$, $b$, and $\sigma^2$, rendering any computations with the additive model represenation obsolete in estimation \cite{fahrmeir2013regression, kneib2006mixed}. 
+Mixed model inference is not the focus of this report, but it is at the core of why the decomposition explained in the chapter before is useful. Therefore it will be discussed here, although rather briefly. Representing additive models as mixed models is especially practical in determining the penalty term $\lambda$ or, respectively, the variance component $\tau^2$, but it can also be used to derive the other parameters, namely $\beta$, $b$, and $\sigma^2$, rendering any computations under the additive model represenation obsolete in estimation \cite{fahrmeir2013regression, kneib2006mixed}. 
 
-\subsection{Coefficients Estimates}
+\subsection{Estimates For Coefficients}
 
 The estimates for $\beta$ and $b$ are derived by maximizing the log-posterior, which is equivalent to the maximum likelihood approach. Both estimates can be estimated simultaneously based on known variance components $\sigma^2$ and $\tau^2$. For this, the mixed model equations, also known as Henderson equations, 
 
@@ -369,87 +369,79 @@ Z^TWy
 
  with $W=\text{diag}(\sigma^2)$ and $Q=\text{blockdiag}(\tau_1^2I_{k_1},..., \tau_p^2I_{k_p})$, can be used. The left matrix of this equation represents the Fisher information. The equation resembles the Fisher-Scoring formula, however, it can be computed directly here and no approximation is needed.
  
- \subsection{Variance Components Estimates}\label{varianceestimates}
+ \subsection{Estimates For Variance Components}\label{varianceestimates}
 
-As the computation of the estimates for $\beta$ and $b$ depends on the variance components $\sigma^2$ and $\tau_j^2$, these need to be determined first. This can be accomplished using either maximum likelihood or restricted maximum likelihood. 
+As the computation of the estimates for $\beta$ and $b$ depends on the variance components $\sigma^2$ and $\tau^2$, these need to be determined first. This can be accomplished using either maximum likelihood or restricted maximum likelihood. 
 
-In the \textit{maximum likelihood (ML)} approach, $b$ is integrated out of the likelihood derived in section \ref{likelihood}, assuming the (partially) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$. For this approach, an estimate for $\beta$ is calculated using Equation \ref{henderson}. This is possible as only $b$, but not $\beta$ depends on the variance components. Plugging in $\hat{\beta}$ then leads to the profile likelihood for $\tau^2$ and $\sigma^2$, which can then be maximized numerically. ML has the advantage over REML, that it can be used to compare models which inlude different smooth terms \cite{wood2011fast}. Using different smooth terms in REML estimation would change the fixed effects structure and render the models incomparable.
+In the \textit{maximum likelihood (ML)} approach, $b$ is integrated out of the likelihood derived in Section \ref{likelihood}, assuming the (partially) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$. Additionally, an estimate for $\beta$ is calculated using Equation \ref{henderson}. The resulting $\beta$ only depends on $\sigma^2$ only and not $\tau^2$. Plugging in $\hat{\beta}$ produces the profile likelihood for $\tau^2$ and $\sigma^2$, which can then be maximized numerically. ML has the advantage over REML, that it can be used to compare models, which include different smooth terms \cite{wood2011fast}. Using different smooth terms in REML estimation would change the fixed effects structure and render the models incomparable.
 
-For the \textit{restricted maximum likelihood (REML)}, $\beta$ is integrated out in addition to $b$, usin the fully marginal distribution of $y$. The resulting likelihood can again be maximized numerically.
+For the \textit{restricted maximum likelihood (REML)}, $\beta$ is integrated out in addition to $b$, using the fully marginal distribution of $y$. The resulting likelihood can again be maximized numerically.
 While the ML approach estimates the variance components of the posterior mode, REML estimates the mode of the marginal posterior for the variance components. This is a major advantage of the REML approach from a Bayesian viewpoint. Occupying a frequentist point of view, REML as the advantage of taking the loss of degrees of freedom due to estimation of $\beta$ into account, which ML estimation does not.
 
-Both approaches need to be maximized numerically, which is typically done using either Fisher-Scoring or Newton-Raphson. Since Newton-Raphson is currently the favoured method, it will be illustrated here using Figure \ref{newton}. In order to maximize the log-likelihood, its derivative, the score function $s(\theta)$ is used with $\theta$ the parameter(s) used to maximize the likelihood, in this case the variance components $\tau^2$ and $\sigma^2$. 
-Newton-Raphson is used to find the root of the score function as follows:
+Both approaches need to be maximized numerically, which is typically done using either Fisher-Scoring or Newton-Raphson. Since Newton-Raphson is currently the favoured method, it will be illustrated here using Figure \ref{newton}. In order to maximize the log-likelihood, the root of its derivative, the score function $s(\theta)$, is computed numerically, with $\theta$ as the parameter(s) used to maximize the likelihood. In this case $\theta$ consists of the variance components $\tau^2$ and $\sigma^2$. 
+Newton-Raphson produces the root of the score function as follows:
 
 \begin{figure}[t]
 \begin{center}
 \includegraphics[width=0.55\textwidth]{Images/newton_report}
 \end{center}
 \vspace{-2em}
-\caption[caption]{Newton-Raphson procedure}\label{newton}
+\caption[caption]{Newton-Raphson procedure with the initial starting point in the upper right corner}\label{newton}
 \end{figure}
 
 \begin{enumerate}
-\item Set $t=0$ and choose a starting point $p_t$ (in the picture the one in the upper right corner).
-\item Calculate the root of the local derivative and set it as the new point $p_{t+1}$.\label{locderiv}
+\item Set $t=0$ and initialize $p_t$ with a starting point.
+\item Calculate the root of the local derivative at point $p_{t}$,  use it as the new point $p_{t+1}$, and set $t=t+1$. \label{locderiv}
 \item Repeat step \ref{locderiv} until convergence and return the current $p_t$.
 \end{enumerate}
 
 
 
-
-
-
 \subsection{Nested Iteration Procedure}\label{nested}
 
-Now that the approaches to calculate the coefficients $\beta$ and $b$ as well as the variance components $\tau^2$ and $\sigma^2$ have been presented, this section will discuss how these calculations can be integrated into a single algorithm producing all estimates \cite{wood2011fast}. Until a decade ago this was done with a single iteration method alternating between updating the coefficients $\hat{\beta}$ and $\hat{b}$ given the current $\hat{\tau}^2$ and updating $\hat{\tau}^2$ using Fisher-Scoring. However, the latter step using Fisher-Scoring was done using a function that depended on the coefficient estimates, which means it changed in every iteration. As a result, convergence could not be guaranteed and indeed this lead to convergence problems in a non-negligible amount of cases.
+Now that the approaches to calculate the coefficients $\beta$ and $b$ as well as the variance components $\tau^2$ and $\sigma^2$ have been presented, this section will discuss how these calculations can be integrated into a single algorithm producing all estimates \cite{wood2011fast}. Until a decade ago this was done with a single iteration method alternating between updating the coefficients $\hat{\beta}$ and $\hat{b}$ given the current $\hat{\tau}^2$ and updating $\hat{\tau}^2$ based on the current $\hat{\beta}$ and $\hat{b}$ using Fisher-Scoring. As both steps depended on the result of the other, convergence could not be guaranteed and this indeed led to convergence problems in a non-negligible amount of cases.
 
-An efficient solution to these convergence problems was introduced by Wood (2011) \cite{wood2011fast}. They suggested a nested iteration method to updating the estimates for the coefficients and variance components as follows:
+An efficient solution to these convergence problems was introduced by Wood (2011) \cite{wood2011fast}. They suggested a nested iteration setup, updating the estimates for the coefficients and variance components as follows:
 
 
 
 \begin{enumerate}
-\item Set $t=0$ and initialize $\hat{\beta}_t$, $\hat{b}_t$ and $\hat{\tau}^2_t$.
-\item Update $\hat{\tau}^2_t$ using Newton-Raphson, while estimating $\hat{\beta}_{\tau}$ and $\hat{b}_\tau$ for each step of the Newton-Raphson algorithm. \label{taustep}
-\item Update $\hat{\beta}_t$ and $\hat{b}_t$ given the current $\hat{\tau}_t$.\label{parastep}
-\item Alternate between \ref{taustep} and \ref{parastep} until convergence and return $\hat{\beta}_t$, $\hat{b}_t$ and $\hat{\tau}^2_t$.
+\item Initialize $\hat{\beta}$, $\hat{b}$ and $\hat{\tau}^2$.
+\item Update $\hat{\tau}^2$ using Newton-Raphson, while estimating $\hat{\beta}_{\tau}$ and $\hat{b}_\tau$ for each step of the Newton-Raphson algorithm. \label{taustep}
+\item Update $\hat{\beta}$ and $\hat{b}$ given the current $\hat{\tau}$.\label{parastep}
+\item Alternate between \ref{taustep} and \ref{parastep} until convergence and return the current $\hat{\beta}$, $\hat{b}$ and $\hat{\tau}^2$.
 \end{enumerate}
 
-With this approach, the updating of the variance component $\tau^2_t$ does not depend on the current estimates of $\beta$ and $b$ but only on the estimates $\hat{\beta}_{\tau}$ and $\hat{b}_\tau$, which are calculated for each Newton-Raphson step in \ref{taustep}. As a result, this nested iteration method is guaranteed to converge (under mild regulatory conditions).
-
-
+With this approach, updating the variance component $\tau^2$ does not depend on the current estimates of $\beta$ and $b$ but only on the estimates $\hat{\beta}_{\tau}$ and $\hat{b}_\tau$, which are calculated for each Newton-Raphson step in step \ref{taustep}. As a result, this nested iteration method is guaranteed to converge (under mild regulatory conditions).
 
 While the estimate of the variance component $\hat{\sigma}^2$ can be determined analogously to $\hat{\tau}^2$ using this approach, it does not require these rather complex methods and is usually calculated separately.
 
-
-
-
-
 \section{Comparison To Other Methods} % eine Seite
 
-Representing additive models as mixed models peovides a way of using (restricted) maximum likelihood inference to determine the optimal penalty term $\hat{\lambda}$. However, other approaches for this exist as well. The advantages and disadvantages of these will be stated in the following.
+Representing additive models as mixed models peovides a way of using (restricted) maximum likelihood inference in order to determine the optimal penalty term $\hat{\lambda}$. However, other methods to determine $\lambda$ were developed as well. The advantages and disadvantages of these will be stated in the following.
 
 \subsection{Fully Bayesian Approach}
 
-Instead of using the restricted maximum likelihood, which is equivalent to empirical Bayes, a fully Bayesian approach based on Markov chain Monte Carlo (MCMC) inference can be conducted \cite{kneib2006mixed}. For this method, no parameterization is needed, which enables direct inference for the coefficients $\gamma$ and $\xi_1,...,\xi_p$. As the $\tau_j^2$ are not treated as fixed anymore, a hyperprior needs to be chosen with a typical choice being $\tau^2_j \sim \text{IG}(0.001,0.001)$. However, this choice might fail, so it is advantageous to calculate the model several times in order to obtain a good model. The difficulty of choosing a suitable prior is one of the main disadvantages of the fully Bayesian approach. Another one is that when drawing samples from the posterior using MCMC simulation it is difficult to determine when the Markov chain has reached divergence.
+Instead of using the restricted maximum likelihood, which is equivalent to empirical Bayes, a fully Bayesian approach based on Markov chain Monte Carlo (MCMC) inference can be conducted \cite{kneib2006mixed}. For this method, no reparameterization is needed, which enables direct inference for the coefficients $\gamma$ and $\xi_1,...,\xi_p$. 
+As the $\tau_j^2$ are not treated as fixed anymore, a hyperprior needs to be chosen. The canonical choice for this hyperprior is an inverse Gamma distribution with $\tau^2_j \sim \text{IG}(0.001,0.001)$. However, this choice might fail, so it is advantageous to calculate the model several times with different parameters for the inverse Gamma distribution in order to obtain a good model. The difficulty of choosing a suitable prior is one of the main disadvantages of the fully Bayesian approach. Another one is that when drawing samples from the posterior using MCMC simulation, it is difficult to determine when the Markov chain has reached convergence.
 
 
 \subsection{Prediction Error Methods}
 
-Prediction error methods are all methods, that directly aim at minimizing the prediction error of the model, optimizing, for example, the Akaike information criterion (AIC) or using cross validation (CV)/generalized cross validation (GCV) \cite{wood2011fast}. This leads to better prediction error performance compared to the ML and REML methods discussed in this report. However, all three methods only penalize overfit weakly which results in a less pronounced optimum in the criterion. As a consequence, prediction error methods have a worse resistance to overfitting, a higher smothing parameter variabiliy, which is also linked to a slower convergence of these parameters, and an increased tendency to have multiple minima in the criterion to optimize. In the past these methods had the advantage, because while they where slower to converge, they did not have the uncertainty of whether the method would converge as used to be the case before the algorithm presented in section \ref{nested} was published. However, since then they became less popular compared to mixed model based ML or REML methods.
+Prediction error methods are all methods, that directly aim at minimizing the prediction error of the model, optimizing, for example, the Akaike information criterion (AIC) or using cross validation (CV)/generalized cross validation (GCV) \cite{wood2011fast}. This leads to better prediction error performance compared to the ML and REML methods discussed in this report. However, all three methods only penalize overfit weakly which results in a less pronounced optimum in the criterion. As a consequence, prediction error methods have a worse resistance to overfitting, a higher smothing parameter variabiliy, which is also linked to a slower convergence of these parameters, and an increased tendency to having multiple minima in the criterion to optimize. In the past these methods had an advantage, because they did not have the convergence problems of ML and REML methods. However, since the algorithm presented in Section \ref{nested} was published, they became less popular.
 
 
 \section{Conclusion} % halbe Seite
 
-This report showed how additive models can be represented as mixed models in order to benefit from mixed model inference especially with regard to determining the optimal penalty term $\hat{\lambda}$.
-For this, the coefficients of the non-linear effects $\xi_j$ of the additive model were decomposed into penalized and unpenalized parts. While this provides an intuitive understanding of how these two model classes are 
+This report showed how additive models can be represented as mixed models in order to benefit from mixed model inference especially with regard to determining the optimal penalty term $\hat{\lambda}$. 
+For this, the coefficients of the non-linear effects $\xi_j$ from the additive model were decomposed into penalized and unpenalized parts. While this provides an intuitive understanding of how these two model classes are 
 connected, it is not typically how estimates are calculated computationally, but a more complex prior is assumed and the calculations that follow are adjusted for this fact. However, the approach, where the coefficients of the non-linear effects are separeted into unpenalized components with flat priors and penalized components with proper priors, shows the nature of the connection between the penalty and the prior distribution more directly, especially with regard to the penalty matrix.
 
-Using this approach, the report sheds light on how the inverse relationship between the penalty term and the prior variance, $\lambda \propto \frac{1}{\tau^2}$, from multiple angles. On the one hand, it was shown how the prior variance and the penalty term influence the likelihood equation in a similar way. On the other hand, it was illustrated that the intensity of shrinkage induced by the penalty is controlled by the variance of the prior. It was also demonstrated that using a nested iteration setup that alternates between estimating the coefficients and the variance components but makes the estimation of the variance components independent of the current coefficient estimates, provides an efficient way to ensuring convergence.
+Using this approach, the report sheds light on the inverse relationship between the penalty term and the prior variance, $\lambda \propto \frac{1}{\tau^2}$, from multiple angles. On the one hand, it was shown how the prior variance and the penalty term influence the likelihood equation in a similar way. On the other hand, it was illustrated that the intensity of shrinkage induced by the penalty is controlled by the variance of the prior. It was also demonstrated that using a nested iteration setup, that alternates between estimating the coefficients and the variance components, but makes the estimation of the variance components independent of the current coefficient estimates, provides an efficient way to ensuring convergence.
 
-This work focused on simple penalized regression splines. However, the approach presented here also works for other splines, for example, thin plate regression splines \cite{wood2011fast}. It can also be extended to representing generalized additive models (or GAMs) as generalized linear mixed models \cite{kneib2006mixed}.
+This work focused on simple penalized regression splines. However, expressing additive models as mixed models is also possible for other splines, for example, thin plate regression splines \cite{wood2011fast}. It can also be extended to representing generalized additive models or GAMs as generalized linear mixed models \cite{kneib2006mixed}.
 
-Working with flexible regression everyone should also know mixed models, as they provide a very interesting new perspective on additive models which is especially important in inference, but can enhance one's understanding of either modelling technique beyond that.
+The field of flexible regression is extended by the field of mixed models, as it provides a very interesting new perspective on additive models. This is especially relevant in inference, but understanding the link between the two models can enhance one's understanding of either modelling technique beyond that.
 
 
 
