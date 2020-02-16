@@ -31,6 +31,7 @@
 %\usepackage{pgfplots}
 %\usepackage{enumitem}
 \usepackage{multicol} 
+\usepackage[ruled,vlined]{algorithm2e}
 
 \usepackage[citestyle=numeric,bibstyle=numeric,sorting=nyt,maxbibnames=9]{biblatex}
 \addbibresource{cite.bib} 
@@ -61,13 +62,13 @@
 \pagenumbering{arabic}
 \section{Introduction}\label{intro}
 
-Flexible regression is a powerful extension to the classical linear model as it allows to estimate non-linear effects. However, the additional flexibility also introduces more room for errors as the typical bias-variance tradeoff becomes a focal point of estimation. The function can be chosen to be close to the data and therefore have a high variance or a more smooth fit can be chosen increasing the risk of introducing bias by restricting the fit too much. Choosing the "wiggliness" of a fit is at the core of fitting a flexible regression.
+Flexible regression is a powerful extension to the classical linear model as it allows to estimate non-linear effects. However, the additional flexibility also introduces more room for errors as the typical bias-variance tradeoff becomes a focal point of estimation. The function can be chosen to be close to the data, which results in a high variance, or a more smooth fit can be selected,  increasing the risk of introducing bias by restricting the fit too much. Deciding on the "wiggliness" of a fit is at the core of fitting a flexible regression.
 
 An example for a flexible regression is the truncated power basis (TPB), where the dependent variable $y$ is estimated based on the independent variable $x$ for a sample $i=1,...,n$ using the model equation
 $$y_i = 
  \theta_0 + \theta_1x_i + \theta_2x_i^2 + ... + \theta_dx_i^d + \sum_{k=1}^K \theta_{dk}(x_i-\kappa_k)_+^d +\epsilon_i,$$
  
- where $\theta_j$ for $j= 1,...,d$ and $\theta_{dk}$ are the parameters to be estimated and $\kappa_k$ represent knots along the interval $]x_{min},x_{max}[$ which are chosen beforehand as well as the error term $\epsilon_i$ \cite{ruppert2003semiparametric, wand2003smoothing}.
+ where $\theta_j$ for $j= 1,...,d$ and $\theta_{dk}$ are the parameters to be estimated and the $\kappa_k$ represent knots along the interval $]x_{min},x_{max}[$, which are chosen beforehand, as well as the error term $\epsilon_i$ \cite{ruppert2003semiparametric, wand2003smoothing}.
  
   A linear TPB with two knots is represented by the model equation
  
@@ -75,59 +76,64 @@ $$y_i =
  \theta_0 + \theta_1x_i +  \theta_{21}(x_i-\kappa_1)_+ + \theta_{22}(x_i-\kappa_2)_+ + \epsilon_i.$$
  
  The parts of the equation that are multiplied with a coefficient are called basis functions. 
-An example of a linear TPB can be seen in figure \ref{tpb} with the grey lines depicting the basis functions and the black line the fitted model.
+An example of a linear TPB can be seen in Figure \ref{tpb} with the grey lines depicting the basis functions and the black line as the fitted model.
  
 This example shows off the fact that the first two basis functions induce a linear fit and the truncated basis functions then add a deviation from that linear fit. Therefore, only the truncated basis functions really introduce wiggliness into the fit. 
-Their effect also depends on $i$ as they are zero for $x<\kappa_k$ and only impact the model for parts of the population. 
-In order to get a smooth function, it is therefore sensible to penalize the truncated basis functions while leaving the other basis functions unpenalized. This penalty term in the maximum likelihood estimation can be seen as the result of a prior distribution or random effects distribution. 
+Their effect also depends on $i$ as they are zero for $x<\kappa_k$ and only impact the fit for parts of the population. 
+In order to get a smooth function, it is therefore sensible to penalize the truncated basis functions while leaving the other basis functions unpenalized. This penalty is enforced in the maximum likelihood estimation by adding a term to the log-likelihood. This term is indistinguishable  from the result of a prior distribution or random effects distribution within the log-likelihood equation. 
 
-It follows, that the TPB can be understood as a mixed model where $\theta_j$ are the parameters for the fixed effects and $\theta_{dk}$ the parameters for the random effects \cite{ruppert2003semiparametric}. Representing the TPB as a mixed model introduces the opportunity to use mixed model inference. This is especially useful in determining the wiggliness of a flexible regression fit.
+It follows, that the TPB can be understood as a mixed model, where the $\theta_j$ are the coefficients for the fixed effects and the $\theta_{dk}$ the coefficients for the random effects \cite{ruppert2003semiparametric}. Representing the TPB as a mixed model introduces the opportunity of using mixed model inference. This, as will be shown lateron, is especially useful in determining the wiggliness of a flexible regression fit.
 
 \begin{figure}
 \begin{center}
-\includegraphics[width=0.8\textwidth]{Images/tpb_report.pdf}
+\vspace{2em}
+\includegraphics[width=0.82\textwidth]{Images/tpb_report.pdf}
 \end{center}
 \vspace{-2em}
 \caption[caption]{The basis functions of a linear TPB with two knots and a possible fit with $\hat{y}_i = 1 + 1 \cdot x_i +  2 \cdot(x_i-\kappa_1)_+ - 4\cdot (x_i-\kappa_2)_+.$}\label{tpb}
 \end{figure}
 
 However, it remains to be proven that this works for other types of flexible regressions as well and not only the TPB. 
-In this work, it will be shown that all penalized regression splines can be interpreted as mixed models. The ensuing chapter is dedicated to flexible regression and especially penalized regression splines. Subsequently, a summary of linear mixed models will be presented. Afterwards, a method of representing all penalized regression splines as mixed models is stated followed by some insights into inference for these models. This report closes with a comparison to other methods and a conclusion.
+In this work, it will be shown that all penalized regression splines can be interpreted and represented as mixed models. 
+
+The ensuing chapter is dedicated to flexible regression and especially penalized regression splines. Subsequently, a mathematical summary of linear mixed models will be presented. Afterwards, an intuitive method of representing all penalized regression splines as mixed models is stated, followed by some insights into inference for these models. This report closes with a comparison to other methods and a conclusion summarizing the main points of this work.
 
 
 \section{Flexible Regression}
 
-One of the most commonly used flexible regression approaches is the \textit{penalized regression spline} which is also the focus of this report \cite{fahrmeir2013regression, ruppert2003semiparametric, wood2017generalized}. In order to introduce this modelling approach, three components are necessary: the (flexible) regression model equations, splines, and a penalty. These three parts will be explained in the following.
+One of the most commonly used flexible regression approaches is the \textit{penalized regression spline} which is also the focus of this report \cite{fahrmeir2013regression, ruppert2003semiparametric, wood2017generalized}. In order to introduce this modelling approach, understanding its three components is necessary: the (flexible) regression model equations, splines, and a penalty. These three parts will be explained in the following.
 
 \subsection{Model Equations}
 
-In nonparametric additive models, the linear parts of the equation are replaced by smooth functions $f_j(.)$ which take the input $\nu_{ij}$, a subset of the features, often just one feature per smooth function, for $j = 1,...,p$ (equation \ref{f}). 
+In nonparametric additive models, the linear parts of the equation are replaced by smooth functions $f_j(.)$ which take the input $\nu_{ij}$, a subset of the features and often just one feature per smooth function, for $j = 1,...,p$ as seen in Equation \ref{f}. 
 The different smooth functions are then added together, hence the name ``additive model''.
-These smooth functions can also be expressed as vectors $v^T_{ij}$  multiplied with their corresponding parameters $\xi_j$ (equation \ref{vector}). These vectors can be merged into matrices when the index $i$ is dropped in order to shorten the notation (equation \ref{matrix}).
+These smooth functions can also be expressed as vectors $v^T_{ij}$  multiplied with their corresponding parameters $\xi_j$ resulting in Equation \ref{vector}. These vectors in turn can be merged into matrices when the index $i$ is dropped in order to shorten the notation to Equation   \ref{matrix}.
 
 \begin{align}
 y_i &= f_1(\nu_{i1}) + ... + f_p(\nu_{ip})+\epsilon_i \label{f}\\
 &=  v^T_{i1}\xi_1 + ... + v^T_{ip}\xi_p+\epsilon_i \label{vector} \\
-y &= V_1\xi_1 + ... + V_p\xi_p = \sum_{j=1}^p V_j\xi_j +\epsilon \label{matrix}
+y &= V_1\xi_1 + ... + V_p\xi_p +\epsilon= \sum_{j=1}^p V_j\xi_j +\epsilon \label{matrix}
 \end{align}
 
-Semiparametric additive models differ from nonparametric ones by including the linear effects, i.\,e., intercept and slope, in a separate term as depicted in equations \ref{f_semi} to \ref{matrix_semi}.
+Semiparametric additive models differ from nonparametric ones by explicitly including a linear component, i.\,e., intercept and slope, in a separate term as depicted in equations \ref{f_semi} to \ref{matrix_semi}.
 
 \begin{align}
 y_i &= f_1(\nu_{i1}) + ... + f_p(\nu_{ip})+ u^T_i\gamma+\epsilon_i\label{f_semi}\\
 &=  v^T_{i1}\xi_1 + ... + v^T_{ip}\xi_p+ u^T_i\gamma+\epsilon_i\label{vector_semi} \\
-y&= V_1\xi_1 + ... + V_p\xi_p + U\gamma= \sum_{j=1}^p V_j\xi_j + U\gamma+\epsilon\label{matrix_semi}
+y&= V_1\xi_1 + ... + V_p\xi_p + U\gamma +\epsilon= \sum_{j=1}^p V_j\xi_j + U\gamma+\epsilon\label{matrix_semi}
 \end{align}
 
 In the following, the matrix notation will be used, as it is the most concise.
-The report later on focusses on semiparametric regression as opposed to nonparametric regression since it is much easier to see how the method presented in section \ref{representation} needs to be adjusted for a missing linear component than it is vice versa.
+The report later on focusses on semiparametric regression as opposed to nonparametric regression, since it is much easier to deduce how the method presented in section \ref{representation} needs to be adjusted for a missing linear component than it is vice versa.
 
 \subsection{Splines}
 
-After the general model structure is clear, the next step is choosing the matrices $V_j$.
-The TPB example in section \ref{intro} already gave an example of a possible choice for that. More generally, the entries in the matrices $V_j$ consist of so-called basis functions. A set of basis functions is called a spline. For univariate semiparametric regression with $l$ basis function, a regression spline equation can be depicted as   
 
-$$y = V\xi + U\gamma 
+
+After the general model structure is cleared up, the next step is choosing the matrices inducing the flexibility of the fit, namely $V_j$.
+The illustration of the TPB in section \ref{intro} already gave an example of a possible choice for that matrix. More generally, the entries in the matrices $V_j$ consist of basis functions. A set of basis functions is called a spline. For univariate semiparametric regression with $l$ basis function, a regression spline equation can be written as   
+
+$$y = V\xi + U\gamma +\epsilon
 = \begin{pmatrix}
 b_1(x_1) & \dots & b_l(x_1) \\
  \vdots  & \ddots & \vdots \\
@@ -150,112 +156,126 @@ b_1(x_n) & ... & b_l(x_n)
 \end{pmatrix} +\epsilon,
 $$
 
-with basis functions $b_1(.), ..., b_l(.)$. There are different splines available, for example, natural cubic splines or B-splines. The latter are characterized as peicewise polynomial segments joined together smoothly at knots. The basis functions for a cubic B-spline are depicted in figure \ref{bsplines}. B-splines are nonparametric as they do not include a linear component in their setup. They are a popular choice for basis functions as their basis functions are each only non-zero for a small part of the possible values for $x$, which makes them numerically more stable.
+
+
+with basis functions $b_1(.), ..., b_l(.)$. There are different splines available, for example, natural cubic splines or B-splines. The latter are characterized as peicewise polynomial segments joined together smoothly at knots. The basis functions for a cubic B-spline are depicted in Figure \ref{bsplines}. B-splines are nonparametric as they do not include a linear component in their setup. They are a popular choice for basis functions as their basis functions are each only non-zero for a small part of the possible values for $x$, which makes them numerically more stable.
 
 %B-Spline
-\begin{figure}
+\begin{figure}[t]
 \begin{center}
-\includegraphics[width=0.6\textwidth]{Images/bspline_report}
+\vspace{2em}
+\includegraphics[width=0.62\textwidth]{Images/bspline_report}
 \end{center}
 \vspace{-2em}
 \caption[caption]{Basis functions of a cubic B-spline}\label{bsplines}
 \end{figure}
 
 
-\subsection{Penalty}
+\subsection{Penalty}\label{prs}
 
-As already mentioned, the bias-variance tradeoff is at the heart of flexible regression. For a given data situation, many possible fits from extremely smooth to very wiggly can be made, two extremes are illustrated in figure \ref{wiggly}. The question is how do we control the bias and variance in a flexible regression setup. So far it can only be controlled by the number of basis functions, which makes adjustments later on really tedious. Instead, the number of basis functions is set as ``enough'' and a penalty is added to the log-likelihood in order to induce shrinkage in the parameters, therefore keeping the wiggliness low. In a semiparametric additive model, the penalty leads to a penalized likelihood as depicted in equation \ref{pen1} with $\lambda$ as the penalty term controlling the intensity of the penalty and the penalty itself being an integral over the curvature, i.\,e., wiggliness or squared second derivative of the fit. As the second derivative of the fit is difficult to determine, a penalty matrix $K$ can be constructed which penalizes the curvature as well leading to equation \ref{pen2}. 
+As already mentioned, the bias-variance tradeoff is at the heart of flexible regression. For a given data situation, many possible fits from extremely smooth to very wiggly can be made, two extremes are illustrated in Figure \ref{wiggly}. The question is how do we control the bias and variance in a flexible regression setup. So far it can only be controlled by the number of basis functions, which makes adjustments later on really tedious. Instead, the number of basis functions is set as ``enough'' and a penalty is added to the log-likelihood in order to induce shrinkage in the coefficients, therefore keeping the wiggliness low. In a semiparametric additive model, the penalty leads to a penalized likelihood as depicted in Equation \ref{pen1} with $\lambda$ as the penalty term controlling the intensity of the penalty and the penalty itself being an integral over the curvature, i.\,e., wiggliness or squared second derivative of the fit. As the second derivative of the fit is difficult to determine, a penalty matrix $K$ can be constructed which penalizes the curvature as well leading to Equation \ref{pen2}. 
 
 \begin{align}
 l_{pen}(\xi,\gamma, \lambda) &=  \log L(\xi, \gamma) + \lambda \int\limits_{x_{min}}^{x_{max}} \left[ f''(x)\right]^2dx \label{pen1}\\
  &= \log L(\xi, \gamma) + \lambda \xi^T K \xi\label{pen2}
 \end{align}
 
+
+
+
 The choice of $K$ depends on the spline used. In the case of B-splines, first order differences, with $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$, are a popular choice. These exploit the fact that using the same value for consecutive $\xi_j$ will result in a horizontal line representing the maximal penalty. First order differences penalize how much each $\xi_j$ can deviate from the one before, therefore controlling the wiggliness of the fit.
 
 Using a penalized regression spline means the wiggliness of the fit can be easily controlled by adjusting the parameter $lambda$. The remaining problem is how do we determine $\lambda$? This is where mixed models come into play. If we can represent a penalized regression spline as a mixed model, we can use its inference methods to derive an optimal $\lambda$.
 
 
-\begin{figure}
+\begin{figure}[t]
 \begin{center}
-\includegraphics[width=0.6\textwidth]{Images/wiggly_report}
+\vspace{2em}
+\includegraphics[width=0.62\textwidth]{Images/wiggly_report}
 \end{center}
 \vspace{-2em}
 \caption[caption]{Bias-variance tradeoff in flexible regression fits: low bias/high variance (dark grey), high bias/low variance (light grey)}\label{wiggly}
 \end{figure}
 
 
-
 \section{Linear Mixed Models}\label{lmm}
 
-Linear mixed models are an extension of the linear model $y_i = x^T_i\beta +\epsilon_i$ incorporating so called \textit{random effects} in order to capture correlation in the data \cite{fahrmeir2013regression}. The correlations might stem from repeated measurements in longitudinal models or clustered data in hierarchical models. In the prediction the fixed or population-averaged effects are modelled separately from the random or cluster-specific effects. The \textit{measurement model} is written as follows:
+Linear mixed models are an extension of the linear model $y_i = x^T_i\beta + \epsilon_i$ by incorporating so called \textit{random effects} in order to capture correlation in the data \cite{fahrmeir2013regression}. These correlations might stem from repeated measurements in longitudinal models or clustered data in hierarchical models. In the prediction, the fixed or population-averaged effects are modelled separately from the random or cluster-specific effects, respectively. The \textit{measurement model} is written as follows:
 
 $$y_i = X_i \beta + Z_i b_i + \epsilon_i,$$
 
 where $i$ refers to an individual in a longitudinal model and to a cluster in a
-hierarchical model, $y_i = ( y_{i1},...,y_{in_i} )^T$ is the $n_i \times 1$ vector of responses for the $n_i$ observations for cluster/individual $i$, $X_i = \left[ x_{i1},..., x_{in_i}\right]^T$ is the $n_i \times p$ matrix of the $p$ fixed-effects covariates, $\beta = (\beta_1,...,\beta_p)^T$ is the $p\times1$ vector of parameters for the fixed effects, $Z_i = \left[z_{i1},...,z_{in_i}\right]^T$ is the $n_i\times q$ matrix of $q$ random covariates (often $Z_i$ is a subvector of $X_i$), $b = (b_1,...,b_q)^T$ is the $q\times1$ vector of parameters for the random effects, and $\epsilon_i = (\epsilon_{i1},...,\epsilon_{in_i})^T$ is the $n_i\times1$ vector of errors.
+hierarchical model, $y_i = ( y_{i1},...,y_{in_i} )^T$ is the $n_i \times 1$ vector of responses for the $n_i$ observations for cluster/individual $i$, $X_i = \left[ x_{i1},..., x_{in_i}\right]^T$ is the $n_i \times p$ matrix of the $p$ fixed-effects covariates, $\beta = (\beta_1,...,\beta_p)^T$ is the $p\times1$ vector of parameters for the fixed effects, $Z_i = \left[z_{i1},...,z_{in_i}\right]^T$ is the $n_i\times q$ matrix of $q$ random covariates (often $Z_i$ is a subvector of $X_i$), $b = (b_1,...,b_q)^T$ is the $q\times1$ vector of parameters for the random effects, and $\epsilon_i = (\epsilon_{i1},...,\epsilon_{in_i})^T$ is the $n_i\times1$ vector of errors terms.
 
 A linear mixed model can be defined hierarchically in stages: 
-In the \textit{first stage} the response is assumed to depend linearly on fixed and random effects as in the measurement model. Additionally, error terms are assumed to be independent and identically distributed (i.i.d.) $\epsilon_i \sim \mathrm{N}_{n_i}(0,R_i)$ typically with $R_i=\sigma^2 I_{n_i}$. 
-In the \textit{second stage} a distribution is introduced for the random effects reflecting the assumption that individuals/clusters are drawn from the population.
-This distribution can be seen as a Bayesian prior. The convention is to use Gaussian random effects $b_i \sim \mathrm{N}_q(0,D)$ with $(q{+}1)\times (q{+}1)$ covariance matrix $D$. In addition, $b_i$ and $\epsilon_i$ are assumed to be mutually independent. 
-Additional correlation structure can be introduced in the error terms $\epsilon_i \sim \mathrm{N}(0, \Sigma_i)$.
+In the \textit{first stage}, the response is assumed to depend linearly on fixed and random effects as in the measurement model. Additionally, error terms are assumed to be independent and identically distributed (i.i.d.) $\epsilon_i \sim \mathrm{N}_{n_i}(0,R_i)$ typically with $R_i=\sigma^2 I_{n_i}$. 
+In the \textit{second stage}, a distribution is introduced for the random effects reflecting the assumption that individuals or clusters are drawn from a specific population.
+This distribution can be seen as a Bayesian prior. The convention is to use Gaussian random effects $b_i \sim \mathrm{N}_q(0,D)$, with $(q{+}1)\times (q{+}1)$ covariance matrix $D$. In addition, $b_i$ and $\epsilon_i$ are assumed to be mutually independent. 
+Additional correlation structure can be introduced in the error terms with $\epsilon_i \sim \mathrm{N}(0, \Sigma_i)$ if needed.
 
 The index $i$ can also be dropped from notation leading to the model equation 
 
 $$y = X \beta + Z b + \epsilon,$$
 
-where $y$, $b$, and $\epsilon$ are just vectors of their respecitve components $y_i$, $b_i$, and$\epsilon_i$. $X$ and $Z$ are matrices made up or their rows $X_i$ and $Z_i$, respectively. As this is the more concise notation it will be used from here on.
+where $y$, $b$, and $\epsilon$ are just the vectors of their respective components $y_i$, $b_i$, and    $\epsilon_i$. $X$ and $Z$ are matrices consisting of $X_i$ and $Z_i$ as their row vectors, respectively. As this is the more concise notation, it will be used from here on.
 
-The maximum likelihood estimates for the coefficients are $\hat{\beta} = (X^T \hat{V}^{-1} X)^{-1} X^T \hat{V}^{-1}y$ and $\hat{b} = \hat{D}Z^T\hat{V}^{-1} (y-X\hat{\beta})$, with the covariance matrix of observations $y_i$ in cluster $i$ as $V_i = \mathrm{Cov}(y_i) = Z_iDZ_i^T + R_i$ and the covariance matrix for all observations $V = \mathrm{Cov}(y) = \mathrm{diag}(V_1,...V_n)$.
-The covariance matrix $V$ is unknown as $R_i$ and $D$ are unknown. $V$ can be estimated  using maximum likelihood (ML) if $\beta$ or its estimate $\hat{\beta}$ is known. An alternative approach is to use the restricted  maximum likelihood  (REML). REML is typically used in linear models to get unbiased estimates. However, it does not generally produce unbiased estimates for mixed models. Nevertheless, it is the method most often used. Here $\beta$ is integrated out of the likelihood corresponding to the Bayesian view of a flat prior on $\beta$. The maximization can be done using Newton-Raphson or Fisher scoring algorithms. 
+The maximum likelihood estimates for the coefficients are $\hat{\beta} = (X^T \hat{V}^{-1} X)^{-1} X^T \hat{V}^{-1}y$ and $\hat{b} = \hat{D}Z^T\hat{V}^{-1} (y-X\hat{\beta})$, with the covariance matrix of observations $y_i$ in cluster $i$ as $V_i = \mathrm{Cov}(y_i) = Z_iDZ_i^T + R_i$ and the covariance matrix for all observations $V = \mathrm{Cov}(y) = \mathrm{diag}(V_1,...,V_n)$.
+The covariance matrix $V$ is unknown as $R_i$ and $D$ are unknown. $V$ can be estimated  using maximum likelihood (ML), if $\beta$ or its estimate $\hat{\beta}$ is known. An alternative approach is to use the restricted  maximum likelihood  (REML). REML is typically used in linear models in order to obtain unbiased estimates. However, it does not generally produce unbiased estimates for mixed models. Nevertheless, it is the more popular of the two methods. Here $\beta$ is integrated out of the likelihood corresponding to the Bayesian view of a flat prior on $\beta$. A comparison of ML and REML methods for estimating the variance components including their advantages and disadvanteges will be given in section {varianceestimates}.  The maximization can be done in both cases using Newton-Raphson or Fisher-Scoring algorithms. 
 
 There are four ways of interpreting a mixed model:
 \begin{itemize}
 \item \textit{classical view}: The random effects reflect that the individuals/clusters are a random sample of a larger population. This view is not always appropriate, e.\,g., if one has data on all individuals/clusters of the given population.
 \item \textit{marginal view}: The random effects generate a general linear
 model with correlated errors.
-\item \textit{Bayesian view}: The random effects distribution is a prior on the random effects.
-\item \textit{penalization view}: The random effects distribution results in a penalty on the random effects under least squares and maximum likelihood estimation inducing to shrinkage towards zero. The intensity of the shrinkage decays with $n$.
+\item \textit{Bayesian view}: The random effects distribution is effectively a prior on the random effects.
+\item \textit{penalization view}: The random effects distribution results in a penalty on the random effects under least squares and maximum likelihood estimation inducing shrinkage towards zero. The intensity of the shrinkage decays with $n$.
 \end{itemize}
 
 
 Several linear mixed models can be differentiated:
 Whereas the \textit{random coefficient model} depicted above estimates both slope and intercept, for the \textit{random intercept model} $Z_ib_i$ is replaced by a single random deviation per cluster/individual from the population intercept $b_i \in \mathbb{R}$. The \textit{variance components model} assumes that the components of $b_i$ are independent resulting in a diagonal matrix $D$.
-\textit{Multilevel mixed models} have more than one cluster affilitation for each observation and \textit{nested mixed models} as a subgroup of these have hierarchical cluster affiliations.
+\textit{Multilevel mixed models} have more than one cluster affilitation for each observation and \textit{nested mixed models} represent a  subgroup of these, which include hierarchical cluster affiliations.
 
 
 \section{Semiparametric Models As Mixed Models}\label{representation} % 4 Seiten
 
 
-The last chapters already fleshed out the idea of representing additive models as mixed models in order to benefit from mixed model inference techniques especially with regard to the penalty term $\lambda$. In order to explore this idea further, an empirical Bayes estimation for an additive model is conducted in the following \cite{kneib2006mixed}. 
+The last chapters already fleshed out the idea of representing additive models as mixed models in order to benefit from mixed model inference techniques especially with regard to the penalty term $\lambda$. In order to explore this idea further, an empirical Bayes estimation for an additive model is conducted in the following \cite{kneib2006mixed}. This approach will yield more insights into the idea, but will ultimately be shown to be flawed. Afterwards, the correct way of translating an additive model into a mixed model will be depicted and the resulting penalized likelihood discussed.
 
-\subsection{Naive empirical Bayes approach}
+\subsection{Naive Empirical Bayes Approach}
 
-Drawing from the introductory example of the truncated power basis, we will attempt to view the additive model $y = \sum_{j=1}^p V_j \xi_j + U \gamma + \epsilon$ with $U$ as the fixed effects and the $V_j$ as random effects. It follows that the prior for $gamma$ is constant, i.\,e., $p(\gamma) \propto 1$, and the prior for $\xi_j$ is Gaussian (as per convention in mixed models) with a known precision matrix $\Sigma^{-1}_j$ and an unknown scaling parameter $\tau^2_j$ leading to the whole prior $p(\xi_j|\tau_j^2)  \propto \exp\left(-\frac{1}{2\tau^2_j} \xi_j^T\Sigma^{-1}_j \xi_j\right) $. The posterior is then proportional to the product of the likelihood and the priors
+Drawing from the introductory example of the truncated power basis, we will attempt to view the additive model $y = \sum_{j=1}^p V_j \xi_j + U \gamma + \epsilon$ with $U$ as the fixed effects and $V_j$ as the random effects. It follows that the prior for $\gamma$ is constant, i.\,e., $p(\gamma) \propto 1$, and the prior for $\xi_j$ is Gaussian (as per convention in mixed models) with a known precision matrix $\Sigma^{-1}_j$ and an unknown scaling parameter $\tau^2_j$ leading to the prior $p(\xi_j|\tau_j^2)  \propto \exp\left(-\frac{1}{2\tau^2_j} \xi_j^T\Sigma^{-1}_j \xi_j\right) $. The posterior is then proportional to the product of the likelihood and the priors
 
 $$p(\xi_1, ... \xi_p, \gamma|y) \propto L(y,\xi_1, ... \xi_p, \gamma)\prod_{j=1}^p p(\xi_j|\tau_j^2). $$
 
-In the next step empirical Bayes diverges from a typical Bayes approach by estimating $\tau^2_j$ (which has so far been treated as fixed) via maximum likelihood with
+In the next step empirical Bayes diverges from a typical Bayes approach by estimating $\tau^2 = (\tau^2_1,..., \tau^2_p)$,which has so far been treated as fixed, via maximum likelihood using the formula
 
-$$\max_{\tau_1, ..., \tau_p} \log L(\gamma, \xi_1,...,\xi_p) - \sum_{j=1}^p \frac{1}{2\tau^2_j} \xi_j^T \Sigma^{-1}_j \xi_j.$$
+$$\tau^2 = \text{arg}\max_{\tau_1, ..., \tau_p} \log L(\gamma, \xi_1,...,\xi_p) - \sum_{j=1}^p \frac{1}{2\tau^2_j} \xi_j^T \Sigma^{-1}_j \xi_j.$$
 
-This equation shows that empirical Bayes is equivalent to penalized maximum likelihood. This is not surprising as the equivalence of priors and penalties in estimation has already been addressed in chapter \ref{lmm}. However, it can be seen here, that the term $\frac{1}{2\tau^2_j}$ is equivalent to the penalty term $\lambda$ and the precision matrix $\Sigma^{-1}_j$ is equivalent to the penalty matrix $K_j$ from the penalized regression splines. 
+This equation shows that empirical Bayes is equivalent to penalized maximum likelihood. This result is not surprising and the equivalence of priors and penalties in estimation has already been addressed in chapter \ref{lmm}. However, it can be seen here, that the term $\frac{1}{2\tau^2_j}$ is equivalent to the penalty term $\lambda$ and the precision matrix $\Sigma^{-1}_j$ is equivalent to the penalty matrix $K_j$ from the penalized regression splines in section \ref{prs}. 
 
-This finding seems initially neat as it provides a simple way of choosing the prior in a way that depends on what penalty matrix we chose and also provides a simple way of varying the intensity of the penalization, namely by adjusting $\tau^2$. However, using the penalty matrix $K_j$ as the precision matrix for the Gaussian prior is problematic because $K_j$ is often rank deficient. For example in the case of B-splines with first order differences $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$. As only differences are penalized, the penalty matrix is always missing one to full rank. This implies the Gaussian prior of $\xi_j$ is improper.
+This finding seems initially neat as it provides a simple way of choosing the prior in a way that depends on which penalty matrix we chose and also provides a simple way of varying the intensity of the penalization, namely by adjusting $\tau^2$. However, using the penalty matrix $K_j$ as a precision matrix for the Gaussian prior is problematic because $K_j$ is often rank deficient. For example in the case of B-splines with first order differences $\xi^TK\xi = \sum(\xi_{k+1} - \xi_{k})^2$. As only differences are penalized, the penalty matrix is always missing one to full rank. This implies that the Gaussian prior of $\xi_j$ is improper.
 
-\subsection{Decomposition of $\xi_j$}
+\subsection{Decomposing The Non-Linear Effects}
 
-As the approach before showed by leading to an improper prior, an additive model cannot be represented as a mixed model by simply treating the linear effects as fixed effects and the non-linear effects as random effects. However, there is a different way of separating the linear and non-linear effects into fixed and random effects which is detailed in Kneib (2006) \cite{kneib2006mixed}. Within this approach, $U$ is still fixed effects, but $\xi_j$ is seperated into 
+As the approach before demonstrated by leading to an improper prior, an additive model can not be represented as a mixed model by simply treating the linear effects as fixed effects and the non-linear effects as random effects. However, there is a different way of separating the linear and non-linear effects into fixed and random effects which is detailed in Kneib (2006) \cite{kneib2006mixed}. Within this approach, $U$ is still part of the fixed effects, but $\xi_j$ is seperated into 
 
 $$\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j,\label{decomp}$$
 
 with $\beta_j$ expressing the unpenalized parts of $\xi_j$ with a flat prior and dimensionality 
 $\text{dim}(\beta_j) = \text{dim}(\xi_j) {-} \text{rank}(K_j)$ and $b_j$ representing the penalized parts of $\xi_j$ with a proper (Gaussian) prior and dimensionality $\text{dim}(\beta_j) = \text{dim}(\xi_j) {-} \text{rank}(K_j)$.
 
-Figure \ref{priorispenalty} shows how $\beta$ and $b$ are estimated differently. As $\beta$ is not penalized, the mode of the marginal likelihood is the maximum likelihood estimate. On the other hand, $b$ is penalized by a prior which is centered around zero and therefore induces shrinkage as the posterior moves toward zero. How much shrinkage is induced depends on the variance of the prior: a low variance leads to more shrinkage and a high variance leads to less shrinkage. This is another way of carving out the inverse relationship of the penalty term $\lambda$ and the prior variance $\tau^2_j$.
+Figure \ref{priorispenalty} shows how $\beta_j$ and $b_j$ are estimated differently. As $\beta_j$ is not penalized, the mode of the marginal likelihood of $\beta_j$ is its maximum likelihood estimate. On the other hand, $b_j$ is penalized by a prior which is centered around zero and therefore induces shrinkage as the posterior moves toward zero. How much shrinkage is induced depends on the variance of the prior: a low variance leads to more shrinkage and a high variance to less. This is another way of carving out the inverse relationship of the penalty term $\lambda$ and the prior variance $\tau^2_j$.
 
-\begin{figure}[b]
+
+
+Now that decomposing $\xi_j$ in this way has been suggested, it is left to show how this decomposition leads to the representation of the additive model eauqtion as the mixed model equation and to proove that this is indeed possible for all penalized regression splines.
+
+For this we start with the typical additive model formulation with Equation \ref{am}. Plugging in 
+$\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$ leads to Equation \ref{einsetzen}. Now we need to define the components of a mixed model from the parts in this equation. We define $\beta := (\beta_1^T,..., \beta_p^T, \gamma^T)$ and $X := (V_j \tilde{X}_j, U)$, therefore grouping all the unpenalized components together, as well as $b := (b_1^T,...,b_p^T)$ and $Z := V_j \tilde{Z}_j$, grouping all penalized components together. This leads to the familiar mixed model formula in Equation \ref{mm}. 
+
+\begin{figure}[h]
+\vspace{2em}
 \centering
 \hspace{-5.5em}
 \begin{minipage}{.5\textwidth}
@@ -269,13 +289,8 @@ Figure \ref{priorispenalty} shows how $\beta$ and $b$ are estimated differently.
   \includegraphics[width=1.2\linewidth]{Images/priorispenalty_highvariance_report}
 \end{minipage}
 \vspace{-1em}
-\caption[caption]{A plot of an unpenalized likelihood depending on one unpenalized $\beta$ and one penalized $b$, depicting the influence of different priors (low variance on the left and high variance on the right) on the penalized maximum likelihood estimates}\label{priorispenalty}
+\caption[caption]{A plot of an unpenalized likelihood depending on a one-dimensional unpenalized $\beta_j$ and a one-dimensional penalized $b_j$, depicting the influence of different priors (low variance on the left and high variance on the right) on the posterior and therefore the penalized maximum likelihood estimates}\label{priorispenalty}
 \end{figure}
-
-Now that decomposing $\xi_j$ in this way has been suggested, it is left to show how this decomposition leads to a mixed model equation and to proove that it is possible for all penalized regression splines.
-For this we start with the typical additive model formulation with equation \ref{am}. Plugging in 
-$\xi_j = \tilde{X}_j \beta_j + \tilde{Z}_j b_j$ leads to equation \ref{einsetzen}. Now we need to define the components of a mixed model from the parts in this equation. We define $\beta := (\beta_1^T,..., \beta_p^T, \gamma^T)$ and $X := (V_j \tilde{X}_j, U)$, therefore grouping all the unpenalized components together, as well as $b := (b_1^T,...,b_p^T)$ and $Z := V_j \tilde{Z}_j$, grouping all penalized components together. This leads to the familiar mixed model formula in equation \ref{mm}. 
-
 
 
 \begin{align}
@@ -284,42 +299,46 @@ y &= \sum_{j=1}^p V_j \xi_j + U\gamma + \epsilon\label{am}\\
  &=   X\beta + Zb + \epsilon\label{mm}
 \end{align}
 
-In order for this decomposition to work as a mixed model several requirements need to be fulfilled.
+In order for this decomposition to result in a mixed model several requirements need to be fulfilled:
 
 \begin{enumerate}
 \item The decomposition is a 1-to-1 transformation. This is equivalent to the matrix $(\tilde{X}_j \:\:  \tilde{Z}_j)$ having full rank. \label{1}
 \item The matrices $\tilde{X}_j$ and $\tilde{Z}_j$ are orthogonal, which can be expressed as $\tilde{X}_j^T \tilde{Z}_j = 0$. (REQ 2 IST PROBLEM) \label{2}
-\item $\beta_j$ not penalized by $K_j$, i.\,.e., $\tilde{X}_j^T K_j \tilde{X}_j = 0$. This is equivalent to $\beta_j$ having a constant prior. \label{3}
-\item $b_j$ has a proper Gaussian prior, i.\,e., $\tilde{Z}_j^T K_j \tilde{Z}_j = I_{kj}$. This leads to having a proper prior instead of an improper one which is the goal of doing this decomposition. \label{4}
+\item $\beta_j$ is not penalized by $K_j$, i.\,e., $\tilde{X}_j^T K_j \tilde{X}_j = 0$. This is equivalent to $\beta_j$ having a constant prior. \label{3}
+\item $b_j$ has a proper Gaussian prior, i.\,e., $\tilde{Z}_j^T K_j \tilde{Z}_j = I_{k_j}$, 
+where $k_j := \text{rank}(K_j)$. This leads to a proper prior instead of an improper one, which is the goal of doing this decomposition. \label{4}
 \end{enumerate}
 
-Fulfilling these requirements works for all possible penalized regression splines, if $\tilde{X}_j$ and $\tilde{Z}_j$ are constructed in the following way. Condition \ref{3} can easily be fulfilled by setting $\tilde{X}_j$ as a basis of the null space of $K_j$. Choosing $\tilde{Z}_j =L_j (L_j^T L_j)^{-1}$ with $K_j =L_j L_j^T$ satisfies conditions \ref{1} and \ref{4}.  Condition \ref{2} can then be fulfilled by choosing $L_j$ such that $L_j^T\tilde{X}_j = 0$ and $\tilde{X}_jL_j^T = 0$. 
-In order to find a helper matrix $L_j$ cpectral decomposition can be utilized, i.\,e., $K_j$ is decomposed into $K_j = \Gamma_j \Lambda_j \Gamma^T$, where $\Gamma_j$ is the matrix of eigenvectors and $\Lambda_j$ the diagonal matrix of eigenvalues of $K_j$, both sorted by the eigenvalues in descending order. After performin this decomposition, $L_j$ can be chosen as $L_j = \Gamma \Lambda_j^{1/2}$. Note, that $L_j$ is not unique and this is just a general way of finding a possible $L_j$. It is not necessarily the best way numerically. For B-splines, for example, with difference matrices as penalty, e.\,g., the first order differences discussed before, decomposing $K_j$ like that is very simple as the first order differences are squared and the so called difference matrix $D_j$ is already computed and fulfills the requirement $K_j = D_j^TD_j$  automatically. Other penalized regression splines may come with different ways to more computationally efficiently derive the helper matrix $L_j$.
+These requirements can be fulfilled for all possible penalized regression splines, if $\tilde{X}_j$ and $\tilde{Z}_j$ are constructed in the following way. Condition \ref{3} can easily be fulfilled by setting $\tilde{X}_j$ as a basis of the null space of $K_j$. Choosing $\tilde{Z}_j =L_j (L_j^T L_j)^{-1}$ with $K_j =L_j L_j^T$ satisfies conditions \ref{1} and \ref{4}.  Condition \ref{2} can then be fulfilled by choosing $L_j$ such that $L_j^T\tilde{X}_j = 0$ and $\tilde{X}_jL_j^T = 0$.
 
-\subsection{The Resulting Penalized Likelihood}
+ 
+In order to find a helper matrix $L_j$ spectral decomposition can be utilized, that is, $K_j$ is decomposed into $K_j = \Gamma_j \Lambda_j \Gamma^T$, where $\Gamma_j$ is the matrix of eigenvectors and $\Lambda_j$ the diagonal matrix of eigenvalues of $K_j$, both sorted by the eigenvalues in descending order. After performing this decomposition, $L_j$ can be chosen as $L_j = \Gamma \Lambda_j^{1/2}$. Note, that $L_j$ is not unique and the calculations presented above provide just a general way of finding a possible $L_j$. It is not necessarily the best way numerically. For example, for B-splines with difference matrices as a penalty, e.\,g., the first order differences discussed before, decomposing $K_j$ like above is very simple as the first order differences are a squared penalty matrix and the so called difference matrix $D_j$ is already computed and fulfills the requirement $K_j = D_j^TD_j$  automatically. Other penalized regression splines may come with different ways to more computationally efficiently derive the helper matrix $L_j$.
 
-After showing how the decomposition works and that it, in fact, always works for penalized regression splines, the next step is to examine the resulting penalized likelihood. Using the requirements from above (which we know are fulfilled), we can simplify the log-prior as follows:
+\subsection{Deriving The Penalized Likelihood}\label{likelihood}
+
+After showing how the decomposition is done and that it, in fact, works for all penalized regression splines, the next step is to examine the resulting penalized likelihood. Using the requirements from above (which we know are fulfilled), we can simplify the log-prior as follows:
 
 
 \begin{align*}
 \log p(\xi_j|\tau_j^2)  &\propto -\frac{1}{2\tau^2_j} \xi_j^TK_j \xi_j\\ 
-&\overset{\text{eq.}\:\ref{decomp}}{=} -\frac{1}{2\tau^2_j} (\tilde{X}_j \beta_j + \tilde{Z}_j b_j)^TK_j (\tilde{X}_j \beta_j + \tilde{Z}_j b_j) \\
+&\overset{\text{Eq.}\:\ref{decomp}}{=} -\frac{1}{2\tau^2_j} (\tilde{X}_j \beta_j + \tilde{Z}_j b_j)^TK_j (\tilde{X}_j \beta_j + \tilde{Z}_j b_j) \\
 &= -\frac{1}{2\tau^2_j} (\tilde{X}_j \beta_j)^TK_j (\tilde{X}_j \beta_j) +
 -\frac{1}{2\tau^2_j} (\tilde{Z}_j b_j)^TK_j (\tilde{Z}_j b_j)\\
 &= -\frac{1}{2\tau^2_j} \beta_j^T \tilde{X}_j^T K_j \tilde{X}_j \beta_j +
 -\frac{1}{2\tau^2_j} b_j^T \tilde{Z}_j^T K_j \tilde{Z}_j b_j\\
-&\overset{\text{req.}\:\ref{3},\ref{4}}{=} -\frac{1}{2\tau^2_j} \beta_j^T \cdot 0 \cdot \beta_j +
--\frac{1}{2\tau^2_j} b_j^T \cdot I_{jj} \cdot b_j\\
+&\overset{\text{Req.}\:\ref{3},\ref{4}}{=} -\frac{1}{2\tau^2_j} \beta_j^T \cdot 0 \cdot \beta_j +
+-\frac{1}{2\tau^2_j} b_j^T \cdot I_{k_j} \cdot b_j\\
 &= -\frac{1}{2\tau_j^2} b_j^T b_j.
 \end{align*}
 
-Therefore, $\beta$ has a constant prior or respectively no prior assumption on its distribution and $b_j$ has a proper prior with $b_j \sim N(0,\tau_j^2I_{jj})$. The log-posterior is equivalent to the log-likelihood with
 
-$$l_p(\beta,b|y) = l(y,\beta,b) - \sum_{j=1}^p \frac{1}{2\tau_j^2} b_j^T  b_j. $$
+Therefore, $\beta$ has a constant prior or respectively no prior assumption on its distribution and $b_j$ has a proper prior with $b_j \sim N(0,\tau_j^2I_{k_j})$. The log-posterior is equivalent to the log-likelihood with
 
-This shows again, that the penalty term $\lambda$ is inversely related to the scaling parameter of the prior $\tau^2_j$, i.\,e., $\lambda \propto \tau_j^2$. Another fact that can be seen from the equation and the prior distribution is that with this approach a variance components model, meaning that components of $b_j$ are independent, is estimated as the precision matrix is given with $I_{jj}$ and the only parameter that needs to be estimated for the prior is $\tau^2_j$.
+$$l_{pen}(\beta,b|y) = l(y,\beta,b) - \sum_{j=1}^p \frac{1}{2\tau_j^2} b_j^T  b_j. $$
 
-The decomposition shown in this chapter is an illustrative way of explaining the connection between additive models and mixed models and how one can be represented as the other. However, this decompostition is not necessary for this representation. A computationally more efficient way is to work with a joint distribution for $\beta_j$ and $b_j$, so the unseparated $\xi_j$. This approach is carried out in Wood (2011) \cite{wood2011fast}. However, since the mathematical way of deriving a likelihood and estimates is mathematically rather complex, the more intuitive way of decomposing $\xi_j$ has been presented here.
+This shows again, that the penalty term $\lambda$ is inversely related to the scaling parameter of the prior $\tau^2$, i.\,e., $\lambda \propto \frac{1}{\tau^2}$. Another fact that can be seen from the equation and the prior distribution is that with this approach a variance components model, meaning that components of $b_j$ are independent, is estimated as the precision matrix is given with $I_{k_j}$. Therefore, the only parameter that needs to be estimated for the prior is $\tau^2_j$.
+
+The decomposition shown in this chapter is an illustrative way of explaining the connection between additive models and mixed models and how one can be represented as the other. However, it is not necessary in order to achieve this representation. A computationally more efficient way is to work with a joint distribution for $\beta_j$ and $b_j$, and thus the unseparated $\xi_j$. This approach is carried out in Wood (2011) \cite{wood2011fast}. However, since the mathematical way of deriving a likelihood and estimates is mathematically rather complex it is less suitable for a clear introduction into the topic and the more intuitive way of decomposing $\xi_j$ has been presented here.
 
 
 
@@ -329,100 +348,40 @@ The decomposition shown in this chapter is an illustrative way of explaining the
 
 \section{Inference} % 3 Seiten
 
-Mixed model inference is certainly not the focus of this report, but it is at the core of why the decomposition in the chapter before is done and therefore it will be discussed here although rather briefly. Representing additive models as mixed models is especially useful in determining the penalty term $\lambda$/$\tau^2$, but it can also be used to derive the other parameters, namely $\beta$, $b$, and $sigma^2$, rendering any computations with the additive model represenation obsolete in estimation. 
+Mixed model inference is certainly not the focus of this report, but it is at the core of why the decomposition in the chapter before is done and therefore it will be discussed here although rather briefly. Representing additive models as mixed models is especially useful in determining the penalty term $\lambda$ or $\tau^2$, but it can also be used to derive the other parameters, namely $\beta$, $b$, and $\sigma^2$, rendering any computations with the additive model represenation obsolete in estimation \cite{fahrmeir2013regression, kneib2006mixed}. 
 
-Estimates $\hat{\beta}$ and $\hat{b}$
+\subsection{Coefficients Estimates}
 
-In order to maximize the (log-)Posterior (equivalent to ML), derive estimates for $\beta$ and $b$ simultaneously based on known $\sigma^2$ and $\tau^2$.
+The estimates for $\beta$ and $b$ are derived by maximizing the log-posterior, which is equivalent to the maximum likelihood approach. Both estimates can be estimated simultaneously based on known variance components $\sigma^2$ and $\tau^2$. For this, the mixed model equations, also known as Henderson equations, 
 
-
-Mixed Model equations:
-$$\overbrace{\begin{pmatrix}
+$$\begin{pmatrix}
 X^TWX & X^TWZ \\
 Z^TWX & Z^TWZ + Q^{-1}
-\end{pmatrix}}^{\text{Fisher information}}
+\end{pmatrix}
 \begin{pmatrix}
-\hat{\beta} \\
-\hat{b}
+\beta\\
+b
 \end{pmatrix} =
 \begin{pmatrix}
 X^TWy \\
 Z^TWy
-\end{pmatrix}$$
+\end{pmatrix},\label{henderson}$$
 
- with $W=\text{diag}(\sigma^2)$ and $Q=\text{blockdiag}(\tau_1^2I_{k1},..., \tau_p^2I_{kp})$
+ with $W=\text{diag}(\sigma^2)$ and $Q=\text{blockdiag}(\tau_1^2I_{k_1},..., \tau_p^2I_{k_p})$, can be used. The left matrix of this equation represents the Fisher information. The equation resembles the Fisher-Scoring formula, however, it can be computed directly here and no approximation is needed.
+ 
+ \subsection{Variance Components Estimates}\label{varianceestimates}
 
+As the computation of the estimates for $\beta$ and $b$ depends on the variance components $\sigma^2$ and $\tau_j^2$, these need to be determined first. This can be accomplished using either maximum likelihood or restricted maximum likelihood. 
 
+In the \textit{maximum likelihood (ML)} approach, $b$ is integrated out of the likelihood derived in section \ref{likelihood}, assuming the (partially) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$. For this approach, an estimate for $\beta$ is calculated using Equation \ref{henderson}. This is possible as only $b$, but not $\beta$ depends on the variance components. Plugging in $\hat{\beta}$ then leads to the profile likelihood for $\tau^2$ and $\sigma^2$, which can then be maximized numerically. ML has the advantage over REML, that it can be used to compare models which inlude different smooth terms \cite{wood2011fast}. Using different smooth terms in REML estimation would change the fixed effects structure and render the models incomparable.
 
-Inhalt
-0. das was drüber steht
-1. beta und b
-2. variance (RE)ML
-3. variance estimates mit newton raphson
-4. new method mit nested iteration im vergleich zu vorher
+For the \textit{restricted maximum likelihood (REML)}, $\beta$ is integrated out in addition to $b$, usin the fully marginal distribution of $y$. The resulting likelihood can again be maximized numerically.
+While the ML approach estimates the variance components of the posterior mode, REML estimates the mode of the marginal posterior for the variance components. This is a major advantage of the REML approach from a Bayesian viewpoint. Occupying a frequentist point of view, REML as the advantage of taking the loss of degrees of freedom due to estimation of $\beta$ into account, which ML estimation does not.
 
-------------------------------------------------------------
+Both approaches need to be maximized numerically, which is typically done using either Fisher-Scoring or Newton-Raphson. Since Newton-Raphson is currently the favoured method, it will be illustrated here using Figure \ref{newton}. In order to maximize the log-likelihood, its derivative, the score function $s(\theta)$ is used with $\theta$ the parameter(s) used to maximize the likelihood, in this case the variance components $\tau^2$ and $\sigma^2$. 
+Newton-Raphson is used to find the root of the score function as follows:
 
-
-Estimates $\hat{\beta}$ and $\hat{b}$
-
-In order to maximize the (log-)Posterior (equivalent to ML), derive estimates for $\beta$ and $b$ simultaneously based on known $\sigma^2$ and $\tau^2$.
-
-
-Mixed Model equations:
-$$\overbrace{\begin{pmatrix}
-X^TWX & X^TWZ \\
-Z^TWX & Z^TWZ + Q^{-1}
-\end{pmatrix}}^{\text{Fisher information}}
-\begin{pmatrix}
-\hat{\beta} \\
-\hat{b}
-\end{pmatrix} =
-\begin{pmatrix}
-X^TWy \\
-Z^TWy
-\end{pmatrix}$$
-
- with $W=\text{diag}(\sigma^2)$ and $Q=\text{blockdiag}(\tau_1^2I_{k1},..., \tau_p^2I_{kp})$
-
-
-Variance Estimates
-
-Maximum Likelihood (integrate $b$ out)
-
-\begin{itemize}
-\item uses (partially) marginal distribution $y \sim \mathrm{N}(X\beta,\Sigma)$
-
-\begin{enumerate}
-\item Derive $\hat{\beta}$ analytically
-\item Plug in to get profile likelihood for $\tau^2$ and $\sigma^2$
-\item Maximize numerically
-\end{enumerate}
-
-\item estimates variance components of posterior mode
-\end{itemize}
-
-
-
-Restricted ML (integrate $b$ and $\beta$ out)
-
-\begin{itemize}
-\item directly uses marginal distribution of $y$
-
-\item Advantages over ML:
-\begin{itemize}
-\item[$+$] considers loss of degrees of freedom due to estimation of $\beta$ 
-\item[$+$] estimates mode of the marginal posterior for the variances
-\end{itemize}
-\end{itemize}
-
-
-
-Variance Estimates $\hat{\sigma}^2$ and $\hat{\tau}^2$
-
-Maximize the restricted likelihood (REML) using Newton-Raphson:
-
-\begin{figure}
+\begin{figure}[t]
 \begin{center}
 \includegraphics[width=0.55\textwidth]{Images/newton_report}
 \end{center}
@@ -430,79 +389,69 @@ Maximize the restricted likelihood (REML) using Newton-Raphson:
 \caption[caption]{Newton-Raphson procedure}\label{newton}
 \end{figure}
 
+\begin{enumerate}
+\item Set $t=0$ and choose a starting point $p_t$ (in the picture the one in the upper right corner).
+\item Calculate the root of the local derivative and set it as the new point $p_{t+1}$.\label{locderiv}
+\item Repeat step \ref{locderiv} until convergence and return the current $p_t$.
+\end{enumerate}
 
 
 
 
 
-(RE)ML estimation
 
-Single iterations (old)
-\begin{itemize}
-\item \textbf{Update  $\boldsymbol{\hat{\beta}}$ and $\boldsymbol{\hat{b}}$} given the current $\hat{\lambda}$
-\item \textbf{Update $\boldsymbol{\hat{\lambda}}$} using Fisher-Scoring (or Newton-Raphson)
+\subsection{Nested Iteration Procedure}\label{nested}
 
-$\rightarrow$ $\mathcal{V}_{\hat{\beta}, \hat{b}}(\lambda)$ depends on $\hat{\beta}$ and $\hat{b}$
-\end{itemize}
-$\Rightarrow$ Convergence is not guaranteed
+Now that the approaches to calculate the coefficients $\beta$ and $b$ as well as the variance components $\tau^2$ and $\sigma^2$ have been presented, this section will discuss how these calculations can be integrated into a single algorithm producing all estimates \cite{wood2011fast}. Until a decade ago this was done with a single iteration method alternating between updating the coefficients $\hat{\beta}$ and $\hat{b}$ given the current $\hat{\tau}^2$ and updating $\hat{\tau}^2$ using Fisher-Scoring. However, the latter step using Fisher-Scoring was done using a function that depended on the coefficient estimates, which means it changed in every iteration. As a result, convergence could not be guaranteed and indeed this lead to convergence problems in a non-negligible amount of cases.
 
-Nested iterations (new)
-\begin{itemize}
-\item Update $\boldsymbol{\hat{\lambda}}$ using Newton-Raphson
-
-\begin{itemize}
-\item for each step: estimate $\boldsymbol{\hat{\beta}_\lambda}$ and $\boldsymbol{\hat{b}_\lambda}$
-\end{itemize}
+An efficient solution to these convergence problems was introduced by Wood (2011) \cite{wood2011fast}. They suggested a nested iteration method to updating the estimates for the coefficients and variance components as follows:
 
 
-$\rightarrow \mathcal{V}(\lambda)$ depends on $\beta$ and $b$ only via $\hat{\beta}_\lambda$ and $\hat{b}_\lambda$
 
-\item Update $\boldsymbol{\hat{\beta}}$ and $\boldsymbol{\hat{b}}$ given the current $\hat{\lambda}$
+\begin{enumerate}
+\item Set $t=0$ and initialize $\hat{\beta}_t$, $\hat{b}_t$ and $\hat{\tau}^2_t$.
+\item Update $\hat{\tau}^2_t$ using Newton-Raphson, while estimating $\hat{\beta}_{\tau}$ and $\hat{b}_\tau$ for each step of the Newton-Raphson algorithm. \label{taustep}
+\item Update $\hat{\beta}_t$ and $\hat{b}_t$ given the current $\hat{\tau}_t$.\label{parastep}
+\item Alternate between \ref{taustep} and \ref{parastep} until convergence and return $\hat{\beta}_t$, $\hat{b}_t$ and $\hat{\tau}^2_t$.
+\end{enumerate}
 
-\end{itemize}
-$\Rightarrow$ Convergence is guaranteed (under mild regulatory conditions)
+With this approach, the updating of the variance component $\tau^2_t$ does not depend on the current estimates of $\beta$ and $b$ but only on the estimates $\hat{\beta}_{\tau}$ and $\hat{b}_\tau$, which are calculated for each Newton-Raphson step in \ref{taustep}. As a result, this nested iteration method is guaranteed to converge (under mild regulatory conditions).
 
 
-------------------------------------------------------------
 
-\cite{fahrmeir2013regression}
+While the estimate of the variance component $\hat{\sigma}^2$ can be determined analogously to $\hat{\tau}^2$ using this approach, it does not require these rather complex methods and is usually calculated separately.
 
-\cite{kneib2006mixed}
 
-\cite{wood2017generalized}
 
-\cite{wood2011fast}
 
 
 \section{Comparison To Other Methods} % eine Seite
 
+Representing additive models as mixed models peovides a way of using (restricted) maximum likelihood inference to determine the optimal penalty term $\hat{\lambda}$. However, other approaches for this exist as well. The advantages and disadvantages of these will be stated in the following.
 
-Fully Bayesian approach (MCMC)
-\begin{itemize}
-\item[$+$] no reparameterization needed
-\item[$-$] Markov chain convergence is difficult to determine
-\item[$-$] how to choose hyperpriors?
-\end{itemize}
+\subsection{Fully Bayesian Approach}
 
-Prediction error methods (AIC, GCV)
-\begin{itemize}
-\item[$+$] better prediction error performance 
-\item[$-$] worse resistance to overfit
-\item[$-$] higher smoothing parameter variability
-\item[$-$] increased tendency to multiple minima
-\item[$\rightarrow$] \textit{more on that next week}
-\end{itemize}
+Instead of using the restricted maximum likelihood, which is equivalent to empirical Bayes, a fully Bayesian approach based on Markov chain Monte Carlo (MCMC) inference can be conducted \cite{kneib2006mixed}. For this method, no parameterization is needed, which enables direct inference for the coefficients $\gamma$ and $\xi_1,...,\xi_p$. As the $\tau_j^2$ are not treated as fixed anymore, a hyperprior needs to be chosen with a typical choice being $\tau^2_j \sim \text{IG}(0.001,0.001)$. However, this choice might fail, so it is advantageous to calculate the model several times in order to obtain a good model. The difficulty of choosing a suitable prior is one of the main disadvantages of the fully Bayesian approach. Another one is that when drawing samples from the posterior using MCMC simulation it is difficult to determine when the Markov chain has reached divergence.
+
+
+\subsection{Prediction Error Methods}
+
+Prediction error methods are all methods, that directly aim at minimizing the prediction error of the model, optimizing, for example, the Akaike information criterion (AIC) or using cross validation (CV)/generalized cross validation (GCV) \cite{wood2011fast}. This leads to better prediction error performance compared to the ML and REML methods discussed in this report. However, all three methods only penalize overfit weakly which results in a less pronounced optimum in the criterion. As a consequence, prediction error methods have a worse resistance to overfitting, a higher smothing parameter variabiliy, which is also linked to a slower convergence of these parameters, and an increased tendency to have multiple minima in the criterion to optimize. In the past these methods had the advantage, because while they where slower to converge, they did not have the uncertainty of whether the method would converge as used to be the case before the algorithm presented in section \ref{nested} was published. However, since then they became less popular compared to mixed model based ML or REML methods.
 
 
 \section{Conclusion} % halbe Seite
-Talk about tpr und andere spline methods maybe
 
-\begin{itemize}
-\item Semiparametric models can be \textbf{written as mixed models}, which enables an efficient way to estimate the penalty term $\lambda$.
-\item In order to get a proper random effects distribution, the flexible parameters have to be \textbf{separated} into sets of parameters with \textbf{flat priors} and sets with \textbf{proper priors}.
-\item The penalty term  is proportional to the inverse of the prior variance: $\mathbf{\boldsymbol{\lambda} \boldsymbol{\propto} \frac{1}{\boldsymbol{\tau}^2}}$
-\item For good results in mixed model inference, the \textbf{penalty term} has to be estimated in a \textbf{nested iteration} setup with the other parameters.
-\end{itemize}
+This report showed how additive models can be represented as mixed models in order to benefit from mixed model inference especially with regard to determining the optimal penalty term $\hat{\lambda}$.
+For this, the coefficients of the non-linear effects $\xi_j$ of the additive model were decomposed into penalized and unpenalized parts. While this provides an intuitive understanding of how these two model classes are 
+connected, it is not typically how estimates are calculated computationally, but a more complex prior is assumed and the calculations that follow are adjusted for this fact. However, the approach, where the coefficients of the non-linear effects are separeted into unpenalized components with flat priors and penalized components with proper priors, shows the nature of the connection between the penalty and the prior distribution more directly, especially with regard to the penalty matrix.
+
+Using this approach, the report sheds light on how the inverse relationship between the penalty term and the prior variance, $\lambda \propto \frac{1}{\tau^2}$, from multiple angles. On the one hand, it was shown how the prior variance and the penalty term influence the likelihood equation in a similar way. On the other hand, it was illustrated that the intensity of shrinkage induced by the penalty is controlled by the variance of the prior. It was also demonstrated that using a nested iteration setup that alternates between estimating the coefficients and the variance components but makes the estimation of the variance components independent of the current coefficient estimates, provides an efficient way to ensuring convergence.
+
+This work focused on simple penalized regression splines. However, the approach presented here also works for other splines, for example, thin plate regression splines \cite{wood2011fast}. It can also be extended to representing generalized additive models (or GAMs) as generalized linear mixed models \cite{kneib2006mixed}.
+
+Working with flexible regression everyone should also know mixed models, as they provide a very interesting new perspective on additive models which is especially important in inference, but can enhance one's understanding of either modelling technique beyond that.
+
+
 
 
 \newpage
