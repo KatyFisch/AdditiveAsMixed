@@ -66,15 +66,12 @@ Flexible regression techniques are a powerful extension to the classical linear 
 
 An example for a flexible regression model is the truncated power basis (TPB) of degree $d$, where the dependent variable $y_i$ is estimated based on the independent variable $x_i$ for a sample with $i=1,...,n$ using the model equation
 $$y_i = 
- \theta_0 + \theta_1x_i + \theta_2x_i^2 + ... + \theta_dx_i^d + \sum_{k=1}^K \theta_{dk}(x_i-\kappa_k)_+^d +\epsilon_i,$$
- 
+ \theta_0 + \theta_1x_i + \theta_2x_i^2 + ... + \theta_dx_i^d + \sum_{k=1}^K \theta_{dk}(x_i{-}\kappa_k)_+^d +\epsilon_i,$$
  where $\theta_j$ for $j= 1,...,d$ and $\theta_{dk}$ for $k= 1,...,K$ are the parameters to be estimated and the term $\kappa_k$ represents the $K$ knots along the interval $]x_{min},x_{max}[$, which are chosen beforehand, and the error term is represented by $\epsilon_i$ \cite{ruppert2003semiparametric, wand2003smoothing}.
  
   A TPB of degree one with two knots is represented by the model equation
- 
  $$y_i = 
- \theta_0 + \theta_1x_i +  \theta_{21}(x_i-\kappa_1)_+ + \theta_{22}(x_i-\kappa_2)_+ + \epsilon_i.$$
- 
+ \theta_0 + \theta_1x_i +  \theta_{21}(x_i{-}\kappa_1)_+ + \theta_{22}(x_i{-}\kappa_2)_+ + \epsilon_i.$$
  The parts of the equation that are multiplied with a coefficient are called basis functions. 
 An example of a linear TPB can be seen in Figure \ref{tpb} with grey lines depicting the basis functions and a black line as the fitted model.
  
@@ -91,6 +88,7 @@ It follows, that the TPB can be understood as a mixed model, where the $\theta_j
 \end{center}
 \vspace{-2em}
 \caption[caption]{The basis functions of a linear TPB with two knots and a possible fit with $\hat{y}_i = 1 + 1 \cdot x_i +  2 \cdot(x_i{-}\kappa_1)_+ - 4\cdot (x_i{-}\kappa_2)_+.$}\label{tpb}
+\vspace{1em}
 \end{figure}
 
 However, it remains to be proven that this works for other types of flexible regressions as well and not only the TPB. 
@@ -101,7 +99,7 @@ The ensuing chapter is dedicated to flexible regression and especially penalized
 
 \section{Flexible Regression}
 
-One of the most commonly used flexible regression approaches is the \textit{penalized regression spline}, which is also the focus of this report \cite{fahrmeir2013regression, ruppert2003semiparametric, wood2017generalized}. In order to introduce this modelling approach, understanding its three components is necessary: the (flexible) regression model equations, splines, and the penalty. These three parts will be explained in the following.
+One of the most commonly used flexible regression approaches is the \textit{penalized regression spline}, which is also the focus of this report \cite{fahrmeir2013regression, ruppert2003semiparametric, wood2017generalized}. In order to introduce this modelling approach, explaining its three components is necessary: the (flexible) regression model equations, splines, and penalties. These three parts will be addressed in the following.
 
 \subsection{Model Equations}
 
@@ -164,14 +162,15 @@ with basis functions $b_1(.), ..., b_l(.)$. There are different splines availabl
 \begin{figure}[t]
 \begin{center}
 \vspace{2em}
-\includegraphics[width=0.62\textwidth]{Images/bspline_report}
+\includegraphics[width=0.66\textwidth]{Images/bspline_report}
 \end{center}
 \vspace{-2em}
 \caption[caption]{Basis functions of a cubic B-spline}\label{bsplines}
+\vspace{1em}
 \end{figure}
 
 
-\subsection{Penalty}\label{prs}
+\subsection{Penalties}\label{prs}
 
 As already mentioned, the bias-variance trade off is at the heart of flexible regression. For a given data situation, many possible fits from extremely smooth to very wiggly can be made. Two extremes are illustrated in Figure \ref{wiggly}. The question is how do we control the bias and variance in a flexible regression setup. So far it can only be controlled by the number of basis functions, which makes adjustments later on really tedious. Instead, the number of basis functions is set as ``enough'' and a penalty is added to the log-likelihood in order to keep the wiggliness low. In a semiparametric additive model, the penalty leads to the penalized likelihood  
 $$l_{pen}(\xi,\gamma, \lambda) =  \log L(\xi, \gamma) + \lambda \int\limits_{x_{min}}^{x_{max}} \left[ f''(x)\right]^2dx,$$
@@ -180,10 +179,10 @@ $$l_{pen}(\xi,\gamma, \lambda) = \log L(\xi, \gamma) + \lambda \xi^T K \xi.$$
 \begin{figure}[b]
 \begin{center}
 \vspace{2em}
-\includegraphics[width=0.62\textwidth]{Images/wiggly_report}
+\includegraphics[width=0.66\textwidth]{Images/wiggly_report}
 \end{center}
 \vspace{-2em}
-\caption[caption]{Bias-variance trade off in flexible regression fits: low bias/high variance (dark grey), high bias/low variance (light grey)}\label{wiggly}
+\caption[caption]{The bias-variance trade off in flexible regression fits: low bias/high variance (dark grey), high bias/low variance (light grey)}\label{wiggly}
 \end{figure}
 
 
@@ -199,10 +198,10 @@ Using a penalized regression spline means the wiggliness of the fit can be easil
 
 \section{Linear Mixed Models}\label{lmm}
 
-Linear mixed models are an extension of the linear model $y_i = x^T_i\beta + \epsilon_i$ by incorporating so called \textit{random effects} in order to capture certain correlation structures in the data \cite{fahrmeir2013regression}. These correlation structures may stem from repeated measurements in longitudinal models or clustered data in hierarchical models. In the estimation procedure, fixed or population-averaged effects are modelled separately from random or individual-specific effects, or cluster-specific effects, respectively. The \textit{measurement model} is written as follows:
+Linear mixed models are an extension of the linear model $y_i = x^T_i\beta + \epsilon_i$ by incorporating so called \textit{random effects} in order to capture certain correlation structures in the data \cite{fahrmeir2013regression}. These correlation structures may stem from repeated measurements in longitudinal models or clustered data in hierarchical models. In the estimation procedure, fixed or population-averaged effects are modelled separately from random or individual-specific effects, or cluster-specific effects, respectively. 
 
+The \textit{measurement model} is written as follows:
 $$y_i = X_i \beta + Z_i b_i + \epsilon_i,$$
-
 where $i$ refers to an individual in a longitudinal model and to a cluster in a
 hierarchical model, $y_i = ( y_{i1},...,y_{in_i} )^T$ is the $n_i \times 1$ vector of responses for the $n_i$ observations for cluster/individual $i$, $X_i = \left[ x_{i1},..., x_{in_i}\right]^T$ is the $n_i \times p$ matrix of the $p$ fixed-effects covariates, $\beta = (\beta_1,...,\beta_p)^T$ is the $p\times1$ vector of parameters for the fixed effects, $Z_i = \left[z_{i1},...,z_{in_i}\right]^T$ is the $n_i\times q$ matrix of $q$ random covariates, $b = (b_1,...,b_q)^T$ is the $q\times1$ vector of parameters for the random effects, and $\epsilon_i = (\epsilon_{i1},...,\epsilon_{in_i})^T$ is the $n_i\times1$ vector of errors. 
 
@@ -306,8 +305,7 @@ In order to find a helper matrix $L_j$, spectral decomposition can be utilized, 
 \subsection{Deriving The Penalized Likelihood}\label{likelihood}
 
 After showing how the decomposition is done and that it, in fact, works for all penalized regression splines, the next step is to examine the resulting penalized likelihood. Using the requirements from above (which we know are fulfilled), we can simplify the log-prior as follows:
-
-
+\vspace{1em}
 \begin{align*}
 \log p(\xi_j|\tau_j^2)  &\propto -\frac{1}{2\tau^2_j} \xi_j^TK_j \xi_j\\ 
 &\overset{\text{Eq.}\:\ref{decomp}}{=} -\frac{1}{2\tau^2_j} (\tilde{X}_j \beta_j + \tilde{Z}_j b_j)^TK_j (\tilde{X}_j \beta_j + \tilde{Z}_j b_j) \\
@@ -374,7 +372,7 @@ Newton-Raphson produces the root of the score function as follows:
 
 \begin{figure}[t]
 \begin{center}
-\includegraphics[width=0.55\textwidth]{Images/newton_report}
+\includegraphics[width=0.65\textwidth]{Images/newton_report}
 \end{center}
 \vspace{-2em}
 \caption[caption]{Newton-Raphson procedure with the initial starting point in the upper right corner}\label{newton}
@@ -407,6 +405,7 @@ An efficient solution to these convergence problems was introduced by Wood (2011
 With this approach, updating the variance component $\tau^2$ does not depend on the current estimates of $\beta$ and $b$ but only on the estimates $\hat{\beta}_{\tau}$ and $\hat{b}_\tau$, which are calculated for each Newton-Raphson step in step \ref{taustep}. As a result, this nested iteration method is guaranteed to converge (under mild regulatory conditions).
 
 While the estimate of the variance component $\hat{\sigma}^2$ can be determined analogously to $\hat{\tau}^2$ using this approach, it does not require these rather complex methods and is usually calculated separately.
+
 
 \section{Comparison To Other Methods} % eine Seite
 
